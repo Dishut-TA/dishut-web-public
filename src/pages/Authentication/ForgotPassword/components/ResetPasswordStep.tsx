@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AuthCard from "./AuthCard";
-import PasswordField from "../../../../components/PasswordField";
+import PasswordField from "@/components/PasswordField";
 
 const ResetPasswordStep = () => {
   const [form, setForm] = useState({

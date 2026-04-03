@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import InputField from '../../../components/InputField';
-import PasswordField from '../../../components/PasswordField';
-import Alert from '../../../components/Alert';
+import InputField from '@/components/InputField';
+import PasswordField from '@/components/PasswordField';
+import Alert from '@/components/Alert';
 
 const Register = () => {
     const [form, setForm] = useState({
