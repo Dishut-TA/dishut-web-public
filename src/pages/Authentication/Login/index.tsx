@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import InputField from '../../../components/InputField';
 import PasswordField from '../../../components/PasswordField';
 import Alert from '../../../components/Alert';
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     email: '',
     password: '',
   });
+
   const [errors, setErrors] = useState<any>({});
   const [status, setStatus] = useState<'success' | 'error' | null>(null);
 
@@ -25,7 +29,6 @@ const Login = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Contoh logic API login
       if (form.email === 'admin@example.com' && form.password === '123456') {
         setStatus('success');
       } else {
@@ -38,14 +41,25 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="flex-1 flex items-center justify-center p-8 min-h-screen">
-        <form className="w-full" onSubmit={handleSubmit}>
-          <h2 className="text-2xl font-bold text-primary text-center mb-4">Selamat Datang Kembali</h2>
-          <p className="text-center text-primary mb-4">Silakan Masukkan Akunmu</p>
+    <div className="flex min-h-screen flex-col md:flex-row">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
+        <form
+          className="w-full max-w-md p-6 md:p-8 rounded-2xl"
+          onSubmit={handleSubmit}
+        >
+          <h2 className="text-2xl font-bold text-primary text-center mb-2">
+            Selamat Datang Kembali
+          </h2>
+          <p className="text-center text-primary mb-6">
+            Silakan Masukkan Akunmu
+          </p>
 
-          {status === 'error' && <Alert type="error" message="Email atau Kata Sandi Salah" />}
-          {status === 'success' && <Alert type="success" message="Login Berhasil!" />}
+          {status === 'error' && (
+            <Alert type="error" message="Email atau Kata Sandi Salah" />
+          )}
+          {status === 'success' && (
+            <Alert type="success" message="Login Berhasil!" />
+          )}
 
           <InputField
             label="Email"
@@ -56,6 +70,7 @@ const Login = () => {
             error={errors.email}
             placeholder="contoh@email.com"
           />
+
           <PasswordField
             label="Kata Sandi"
             name="password"
@@ -64,9 +79,15 @@ const Login = () => {
             error={errors.password}
             placeholder="Masukkan kata sandi"
           />
-          <p className="text-right text-sm mt-1 text-primary font-semibold cursor-pointer hover:underline">
+
+          {/* FORGOT PASSWORD */}
+          <p
+            onClick={() => navigate('/forgot-password')}
+            className="text-right text-sm mt-1 text-primary font-semibold cursor-pointer hover:underline"
+          >
             Lupa Kata Sandi?
           </p>
+
           <button
             type="submit"
             className="w-full bg-primary text-white p-4 rounded-full mt-4 hover:bg-tertiary"
@@ -75,11 +96,17 @@ const Login = () => {
           </button>
 
           <p className="text-center text-sm mt-4 text-primary">
-            Tidak punya akun? <span className="font-bold">Buat Akun</span>
+            Tidak punya akun?{' '}
+            <span
+              onClick={() => navigate('/register')}
+              className="font-bold cursor-pointer hover:underline"
+            >
+              Buat Akun
+            </span>
           </p>
         </form>
       </div>
-      <div className="flex-1 bg-secondary"></div>
+      <div className="hidden md:block md:w-1/2 bg-secondary"></div>
     </div>
   );
 };
