@@ -7,3 +7,7 @@
   --color-customBlack: #303030;
   --color-customWhite: #F5F5F5;
 }
+
+body {
+  font-family: 'Lato', sans-serif;
+}

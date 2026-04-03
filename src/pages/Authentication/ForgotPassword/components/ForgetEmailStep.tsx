@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AuthCard from "./AuthCard";
-import InputField from "../../../../components/InputField";
+import InputField from "@/components/InputField";
 
 interface Props {
   onNext: (email: string) => void;
