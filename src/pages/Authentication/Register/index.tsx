@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import InputField from '@/components/InputField';
 import PasswordField from '@/components/PasswordField';
 import Alert from '@/components/Alert';
+import SignUp from '@/assets/images/SignUp.png';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [form, setForm] = useState({
@@ -15,6 +17,7 @@ const Register = () => {
     });
     const [errors, setErrors] = useState<any>({});
     const [status, setStatus] = useState<'success' | 'error' | null>(null);
+    const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -40,7 +43,9 @@ const Register = () => {
 
     return (
         <div className="flex min-h-screen flex-col md:flex-row">
-            <div className="hidden md:block md:w-1/2 bg-secondary"></div>
+            <div className="hidden md:block md:w-1/2 bg-secondary">
+                <img src={SignUp} className='object-cover mx-auto m-auto' />
+            </div>
             <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
                 <form className="w-full max-w-md p-6 md:p-8 rounded-2xl" onSubmit={handleSubmit}>
 
@@ -76,12 +81,12 @@ const Register = () => {
                     <PasswordField placeholder='*********' label="Kata Sandi" name="password" value={form.password} onChange={handleChange} error={errors.password} />
                     <PasswordField placeholder='*********' label="Konfirmasi Kata Sandi" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
 
-                    <button type="submit" className="w-full bg-primary text-white p-4 rounded-full mt-4 hover:bg-tertiary">
+                    <button type="submit" className="w-full cursor-pointer transition-all bg-primary text-white p-4 rounded-full mt-4 hover:bg-tertiary">
                         Buat Akun
                     </button>
 
                     <p className="text-center text-sm mt-4 text-primary">
-                        Sudah punya akun? <span className='font-bold'>Masuk</span>
+                        Sudah punya akun? <span className='font-bold cursor-pointer transition-all hover:text-tertiary' onClick={() => navigate("/login")}>Masuk</span>
                     </p>
                 </form>
             </div>

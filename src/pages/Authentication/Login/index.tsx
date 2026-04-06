@@ -90,7 +90,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-primary text-white p-4 rounded-full mt-4 hover:bg-tertiary"
+            className="w-full bg-primary text-white transition-all cursor-pointer p-4 rounded-full mt-4 hover:bg-tertiary"
           >
             Masuk
           </button>
@@ -99,7 +99,7 @@ const Login = () => {
             Tidak punya akun?{' '}
             <span
               onClick={() => navigate('/register')}
-              className="font-bold cursor-pointer hover:underline"
+              className="font-bold cursor-pointer hover:underline transition-all"
             >
               Buat Akun
             </span>
