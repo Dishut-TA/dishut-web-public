@@ -3,20 +3,20 @@ import Button from "@/components/Button";
 
 const HeroSection = () => {
   return (
-    <section className="relative w-full min-h-screen flex items-center">
+    <section className="relative w-full min-h-screen flex items-center justify-center text-center">
       
       <div className="absolute inset-0">
         <img
           src={BG}
-          className="w-full h-full object-"
+          className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/30" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-        <div className="w-1/2 text-customWhite">
+      <div className="relative z-10 max-w-7xl px-4 md:px-8">
+        <div className="max-w-2xl text-customWhite">
           
-          <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4">
+          <h1 className="text-2xl md:text-4xl font-bold leading-tight mb-4">
             Platform Konservasi Hutan Terintegrasi Berbasis WebGIS
           </h1>
 
@@ -25,9 +25,8 @@ const HeroSection = () => {
             monitoring lapangan berbasis bukti, serta transparansi kontribusi publik dan investasi
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex mx-auto m-auto mt-12 items-center justify-center flex-col sm:flex-row gap-3">
             <Button label="Lihat Peta Konservasi" variant="secondary" size="lg" />
-            <Button label="Donasi Sekarang" variant="tertiary" size="lg" />
           </div>
 
         </div>
