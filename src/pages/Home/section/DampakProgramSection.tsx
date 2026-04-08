@@ -9,7 +9,7 @@ const DampakProgramSection = () => {
   ];
 
   return (
-    <section className="bg-[#F5F5F5] py-16 px-12 md:px-24">
+    <section className="bg-customWhite py-16 px-12 md:px-24">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-10">
         
         <div className="flex-1">
