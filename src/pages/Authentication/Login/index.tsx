@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import InputField from '@/components/InputField';
 import PasswordField from '@/components/PasswordField';
 import Alert from '@/components/Alert';
+import BG from '@/assets/images/Login.png';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -106,7 +107,9 @@ const Login = () => {
           </p>
         </form>
       </div>
-      <div className="hidden md:block md:w-1/2 bg-secondary"></div>
+      <div className="hidden md:block md:w-1/2 bg-secondary">
+        <img src={BG} alt="" />
+      </div>
     </div>
   );
 };

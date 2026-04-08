@@ -1,5 +1,6 @@
 import BG from "@/assets/images/BGHutan.png";
 import Button from "@/components/Button";
+import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 const HeroSection = () => {
   return (
@@ -26,7 +27,7 @@ const HeroSection = () => {
           </p>
 
           <div className="flex mx-auto m-auto mt-12 items-center justify-center flex-col sm:flex-row gap-3">
-            <Button label="Lihat Peta Konservasi" variant="secondary" size="lg" />
+            <Button label="Lihat Peta Konservasi" variant="secondary" size="lg" rightIcon={<MdOutlineKeyboardArrowRight size={24}/>}/>
           </div>
 
         </div>
