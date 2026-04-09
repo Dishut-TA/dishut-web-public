@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Register from './pages/Authentication/Register';
 import Login from './pages/Authentication/Login';
@@ -7,6 +7,7 @@ import Home from './pages/Home';
 
 import MainLayout from './components/layout/MainLayout';
 import AuthLayout from './components/layout/AuthLayout';
+import Donation from './pages/Donation';
 
 function App() {
   return (
@@ -23,10 +24,10 @@ function App() {
         {/* MAIN APP (pakai navbar) */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/donasi" element={<Donation />} />
         </Route>
 
-        {/* DEFAULT */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* 404 Page */}
 
       </Routes>
     </Router>
