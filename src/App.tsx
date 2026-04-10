@@ -8,6 +8,8 @@ import Home from './pages/Home';
 import MainLayout from './components/layout/MainLayout';
 import AuthLayout from './components/layout/AuthLayout';
 import Donation from './pages/Donation';
+import DonasiExplore from './pages/Donation/sections/DonasiExplore';
+import DonasiDetail from './pages/Donation/sections/DonasiDetail';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/donasi" element={<Donation />} />
+          <Route path="/donasi/explore" element={<DonasiExplore />} />
+          <Route path="/donasi/detail/:id" element={<DonasiDetail />} />
         </Route>
 
         {/* 404 Page */}

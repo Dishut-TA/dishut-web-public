@@ -1,6 +1,7 @@
 import Button from "@/components/Button";
 import ProgramCard from "@/components/ProgramCard";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 type StatItem = {
   value: string;
@@ -39,6 +40,7 @@ const DATA = [
 ];
 
 const StatsSection = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative z-20 bg-customWhite">
 
@@ -79,6 +81,7 @@ const StatsSection = () => {
               variant="ghost"
               rightIcon={<MdOutlineKeyboardArrowRight size={20} />}
               className="font-semibold"
+              onClick={() => navigate('/donasi/explore')}
             />
           </div>
 
