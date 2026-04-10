@@ -9,6 +9,7 @@ interface Props {
   image: string;
   collected: number;
   target: number;
+  onClick?: () => void;
 }
 
 const formatRupiah = (num: number) =>
@@ -25,6 +26,7 @@ const ProgramCard: React.FC<Props> = ({
   image,
   collected,
   target,
+  onClick
 }) => {
   const progress = Math.min((collected / target) * 100, 100);
 
@@ -86,6 +88,7 @@ const ProgramCard: React.FC<Props> = ({
           variant="primary"
           size="md"
           className="mt-2"
+          onClick={onClick}
         />
 
       </div>
