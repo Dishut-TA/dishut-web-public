@@ -4,6 +4,8 @@ import PasswordField from '@/components/PasswordField';
 import Alert from '@/components/Alert';
 import SignUp from '@/assets/images/SignUp.png';
 import { useNavigate } from 'react-router-dom';
+import Button from '@/components/Button';
+import { FcGoogle } from 'react-icons/fc';
 
 const Register = () => {
     const [form, setForm] = useState({
@@ -88,6 +90,24 @@ const Register = () => {
                     <p className="text-center text-sm mt-4 text-primary">
                         Sudah punya akun? <span className='font-bold cursor-pointer transition-all hover:text-tertiary' onClick={() => navigate("/login")}>Masuk</span>
                     </p>
+                              {/* DIVIDER */}
+                              <div className="flex items-center my-6">
+                                <div className="grow h-px bg-customBlack"></div>
+                                <span className="mx-3 text-customBlack text-sm">Or</span>
+                                <div className="grow h-px bg-customBlack"></div>
+                              </div>
+                    
+                              {/* LOGIN WITH GOOGLE */}
+                              <Button
+                                variant="outline"
+                                fullWidth
+                                size="lg"
+                                leftIcon={<FcGoogle size={20} />}
+                                onClick={() => console.log("Login with Google")}
+                                className='font-semibold'
+                              >
+                                Sign Up with Google
+                              </Button>
                 </form>
             </div>
         </div>
