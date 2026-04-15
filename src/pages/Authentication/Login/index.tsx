@@ -4,6 +4,8 @@ import InputField from '@/components/InputField';
 import PasswordField from '@/components/PasswordField';
 import Alert from '@/components/Alert';
 import BG from '@/assets/images/Login.png';
+import Button from "@/components/Button";
+import { FcGoogle } from "react-icons/fc";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -97,7 +99,7 @@ const Login = () => {
           </button>
 
           <p className="text-center text-sm mt-4 text-primary">
-            Tidak punya akun?{' '}
+            Tidak punya akun?{" "}
             <span
               onClick={() => navigate('/register')}
               className="font-bold cursor-pointer hover:underline transition-all"
@@ -105,6 +107,25 @@ const Login = () => {
               Buat Akun
             </span>
           </p>
+
+          {/* DIVIDER */}
+          <div className="flex items-center my-6">
+            <div className="grow h-px bg-customBlack"></div>
+            <span className="mx-3 text-customBlack text-sm">Or</span>
+            <div className="grow h-px bg-customBlack"></div>
+          </div>
+
+          {/* LOGIN WITH GOOGLE */}
+          <Button
+            variant="outline"
+            fullWidth
+            size="lg"
+            leftIcon={<FcGoogle size={20} />}
+            onClick={() => console.log("Login with Google")}
+            className='font-semibold'
+          >
+            Login with Google
+          </Button>
         </form>
       </div>
       <div className="hidden md:block md:w-1/2 bg-secondary">
