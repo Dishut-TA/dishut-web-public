@@ -16,7 +16,7 @@ const PetaPrioritasKonservasiSection = () => {
         </div>
 
         {/* Map */}
-        <MapCard />
+        <MapCard showNavigateButton/>
 
       </div>
     </section>
