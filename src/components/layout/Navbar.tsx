@@ -4,7 +4,7 @@ import { useNavigate, NavLink } from "react-router-dom";
 
 const menus = [
   { label: "Beranda", path: "/" },
-  { label: "Peta Kekritisan", path: "/peta-kekritisan" },
+  { label: "Pemetaan", path: "/pemetaan" },
   { label: "Monitoring", path: "/monitoring" },
   { label: "Donasi", path: "/donasi" },
   { label: "Investasi", path: "/investasi" },
