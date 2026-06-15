@@ -10,6 +10,8 @@ export interface DonationFormData {
   email: string;
   phone: string;
   amount: string;
+  jenisBibit: string;
+  jumlahBibit: string;
   paymentMethod: string;
   virtualAccount: string;
 }
@@ -61,7 +63,8 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
 
         {currentStep === 2 && (
           <DonationAmountStep
-            amount={formData.amount}
+            jenisBibit={formData.jenisBibit}
+            jumlahBibit={formData.jumlahBibit}
             paymentMethod={formData.paymentMethod}
             onChange={(field, value) => onChange(field, value)}
           />

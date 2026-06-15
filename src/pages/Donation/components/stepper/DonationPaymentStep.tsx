@@ -31,7 +31,7 @@ const DonationPaymentStep: React.FC<DonationPaymentStepProps> = ({
   };
 
   return (
-    <div className="flex min-h-[320px] flex-col items-center justify-center text-center">
+    <div className="flex min-h-80 flex-col items-center justify-center text-center">
       <p className="text-2xl font-semibold text-primary md:text-3xl">
         {paymentMethod || "Virtual Account"}
       </p>

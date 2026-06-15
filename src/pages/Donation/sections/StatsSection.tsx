@@ -9,22 +9,23 @@ type StatItem = {
 };
 
 const stats: StatItem[] = [
-  { value: "50+", label: "Program telah berjalan" },
-  { value: "40+", label: "Lokasi penyaluran" },
-  { value: "1000+", label: "Pohon telah ditanam" },
+  { value: "50+", label: "Total Bibit Didonasikan" },
+  { value: "40+", label: "Bibit Terealisasi" },
+  { value: "1000+", label: "Sedang Diproses" },
 ];
 
+// DATA diperbarui agar sesuai dengan tipe props ProgramCard terbaru
 const DATA = [
   {
     id: 1,
-    title: "Rehabilitasi Hutan DAS Cimanuk",
-    location: "Garut, Jawa Barat",
+    title: "Pemulihan Lahan Kritis Cisadane",
+    location: "Kabupaten Bogor",
     description:
       "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
     image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-    collected: 130000000,
-    target: 200000000,
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+    collected: "2000",
+    status: "Aktif" as const,
   },
   {
     id: 2,
@@ -33,14 +34,26 @@ const DATA = [
     description:
       "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
     image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-    collected: 130000000,
-    target: 200000000,
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
+    collected: "13.000",
+    status: "Aktif" as const,
+  },
+  {
+    id: 3,
+    title: "Pemulihan Kawasan Resapan Air",
+    location: "Bandung, Jawa Barat",
+    description:
+      "Dukung pemulihan kawasan resapan air melalui penanaman vegetasi dan penguatan ekosistem daerah tangkapan air.",
+    image:
+      "https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?auto=format&fit=crop&w=1200&q=80",
+    collected: "9.500",
+    status: "Aktif" as const,
   },
 ];
 
 const StatsSection = () => {
   const navigate = useNavigate();
+
   return (
     <section className="relative z-20 bg-customWhite">
 
@@ -88,7 +101,11 @@ const StatsSection = () => {
           {/* PROGRAM GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {DATA.map((item) => (
-              <ProgramCard key={item.id} {...item} />
+              <ProgramCard 
+                key={item.id} 
+                {...item} 
+                onClick={() => navigate(`/donasi/detail/${item.id}`)} 
+              />
             ))}
           </div>
 
