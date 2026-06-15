@@ -28,6 +28,7 @@ function App() {
         {/* MAIN APP (pakai navbar) */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/pemetaan" element={<Pemetaan />} />
           <Route path="/donasi" element={<Donation />} />
           <Route path="/donasi/explore" element={<DonasiExplore />} />
           <Route path="/donasi/detail/:id" element={<DonasiDetail />} />
