@@ -1,14 +1,17 @@
 import Button from "@/components/Button";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 type HeroDonasiSectionProps = {
   backgroundImage: string;
 };
 
 const HeroDonasiSection = ({ backgroundImage }: HeroDonasiSectionProps) => {
+  const navigate = useNavigate();
+
   return (
     <section
-      className="relative w-full min-h-[500px] md:min-h-[600px] flex items-center justify-center text-center"
+      className="relative w-full min-h-125 md:min-h-150 flex items-center justify-center text-center"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",
@@ -34,6 +37,7 @@ const HeroDonasiSection = ({ backgroundImage }: HeroDonasiSectionProps) => {
           size="lg"
           className="mt-2 mx-auto"
           rightIcon={<MdOutlineKeyboardArrowRight size={20} />}
+          onClick={() => {navigate('/donasi/explore')}}
         />
       </div>
     </section>

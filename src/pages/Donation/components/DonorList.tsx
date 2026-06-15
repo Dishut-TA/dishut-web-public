@@ -10,14 +10,13 @@ interface Donor {
 
 interface DonorListProps {
   donors: Donor[];
-  formatter: (value: number) => string;
 }
 
-const DonorList: React.FC<DonorListProps> = ({ donors, formatter }) => {
+const DonorList: React.FC<DonorListProps> = ({ donors }) => {
   return (
     <div className="space-y-3">
       {donors.map((donor) => (
-        <DonorItem key={donor.id} donor={donor} formatter={formatter} />
+        <DonorItem key={donor.id} donor={donor} />
       ))}
     </div>
   );

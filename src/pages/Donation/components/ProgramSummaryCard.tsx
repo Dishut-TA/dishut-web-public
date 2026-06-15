@@ -2,22 +2,21 @@ import React, { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Button from "@/components/Button";
 import { MdLocationOn } from "react-icons/md";
+import { PiLeafFill } from "react-icons/pi";
 import DonationStepper, { type DonationFormData } from "./stepper/DonationStepper";
 
 interface ProgramSummaryCardProps {
   title: string;
   location: string;
   image: string;
-  collected: number;
-  target: number;
+  collected: number; // Angka jumlah bibit terkumpul
+  target: number;    // Angka target bibit
+  status: "Aktif" | "Non-Aktif";
 }
 
-const formatRupiah = (num: number) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(num);
+// Format angka biasa dengan pemisah ribuan (contoh: 13000 jadi 13.000)
+const formatNumber = (num: number) =>
+  new Intl.NumberFormat("id-ID").format(num);
 
 const cardTransition = {
   duration: 0.7,
@@ -29,18 +28,18 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
   image,
   collected,
   target,
+  status,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<DonationFormData>({
-    name: "",
-    email: "",
-    phone: "",
-    amount: "",
-    paymentMethod: "",
-    virtualAccount: ""
-  });
+const [formData, setFormData] = useState<DonationFormData>({
+  name: "", email: "", phone: "",
+  jenisBibit: "Mahoni", // Tambahan baru
+  jumlahBibit: "",      // Tambahan baru
+  amount: "0", paymentMethod: "", virtualAccount: "",
+});
 
+  // Kalkulasi progress berdasarkan bibit
   const progress = useMemo(
     () => Math.min((collected / target) * 100, 100),
     [collected, target]
@@ -58,23 +57,21 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
     setIsFlipped(true);
   };
 
-    const handleNext = () => {
+  const handleNext = () => {
     if (currentStep === 1) {
-        setCurrentStep(2);
-        return;
+      setCurrentStep(2);
+      return;
     }
 
     if (currentStep === 2) {
-        const generatedVa = generateVirtualAccount();
-
-        setFormData((prev) => ({
+      const generatedVa = generateVirtualAccount();
+      setFormData((prev) => ({
         ...prev,
         virtualAccount: generatedVa,
-        }));
-
-        setCurrentStep(3);
+      }));
+      setCurrentStep(3);
     }
-    };
+  };
 
   const handleBack = () => {
     if (currentStep > 1) {
@@ -82,17 +79,17 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
     }
   };
 
-    const handleCheckStatus = () => {
+  const handleCheckStatus = () => {
     console.log("Check payment status:", {
-        amount: formData.amount,
-        paymentMethod: formData.paymentMethod,
-        virtualAccount: formData.virtualAccount,
+      amount: formData.amount,
+      paymentMethod: formData.paymentMethod,
+      virtualAccount: formData.virtualAccount,
     });
-    };
+  };
 
   const generateVirtualAccount = () => {
-  return `${Math.floor(1000000000000000 + Math.random() * 9000000000000000)}`;
-};
+    return `${Math.floor(1000000000000000 + Math.random() * 9000000000000000)}`;
+  };
 
   return (
     <motion.div
@@ -113,25 +110,33 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
             className="w-full origin-center"
           >
             <div className="min-h-107.5 rounded-2xl bg-white p-4 shadow-sm md:p-5">
-              <div className="overflow-hidden rounded-xl">
+              <div className="relative overflow-hidden rounded-xl">
                 <img
                   src={image}
                   alt="Program donasi"
                   className="h-52 w-full object-cover md:h-60"
                 />
+                <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-[#344237] text-white text-[10px] font-semibold">
+                  {status}
+                </div>
               </div>
 
               <div className="mt-4 flex items-center gap-1 text-sm text-primary/80">
-                <MdLocationOn className="text-base text-primary" />
+                <MdLocationOn className="text-base text-primary/70" />
                 <span>{location}</span>
               </div>
 
+              {/* Progress Bar & Info Bibit */}
               <div className="mt-4">
                 <div className="mb-2 flex items-center justify-between text-sm text-primary">
-                  <span className="text-xl font-semibold md:text-2xl">
-                    {formatRupiah(collected)}
-                  </span>
-                  <span className="font-medium">{Math.round(progress)}%</span>
+                  <div className="flex items-center gap-1">
+                    <PiLeafFill className="text-primary text-xl" />
+                    <span className="text-xl font-semibold md:text-2xl">
+                      {formatNumber(collected)}
+                    </span>
+                    <span className="font-semibold text-primary/80 mt-1">Bibit</span>
+                  </div>
+                  <span className="font-bold">{Math.round(progress)}%</span>
                 </div>
 
                 <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
@@ -141,8 +146,8 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
                   />
                 </div>
 
-                <p className="mt-2 text-xs font-medium text-primary/70">
-                  dari target {formatRupiah(target)}
+                <p className="mt-2 text-xs font-semibold text-primary/70">
+                  dari target {formatNumber(target)} Bibit
                 </p>
               </div>
 
@@ -166,12 +171,12 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
             className="w-full origin-center"
           >
             <DonationStepper
-            currentStep={currentStep}
-            formData={formData}
-            onChange={handleChange}
-            onNext={handleNext}
-            onBack={handleBack}
-            onCheckStatus={handleCheckStatus}
+              currentStep={currentStep}
+              formData={formData}
+              onChange={handleChange}
+              onNext={handleNext}
+              onBack={handleBack}
+              onCheckStatus={handleCheckStatus}
             />
           </motion.div>
         )}

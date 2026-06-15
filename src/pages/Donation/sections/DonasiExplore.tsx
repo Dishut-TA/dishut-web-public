@@ -3,17 +3,18 @@ import ProgramCard from "@/components/ProgramCard";
 import { FiSearch } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
+// Perbarui data mock
 const PROGRAM_DATA = [
   {
     id: 1,
-    title: "Rehabilitasi Hutan DAS Cimanuk",
-    location: "Garut, Jawa Barat",
+    title: "Pemulihan Lahan Kritis Cisadane", // Perbarui judul data mock agar sesuai gambar
+    location: "Kabupaten Bogor",
     description:
       "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
     image:
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-    collected: 130000000,
-    target: 200000000,
+    collected: "2000", // Ubah ke angka mentah bibit (string)
+    status: "Aktif", // Tambahkan status
   },
   {
     id: 2,
@@ -22,9 +23,9 @@ const PROGRAM_DATA = [
     description:
       "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
     image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-    collected: 130000000,
-    target: 200000000,
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
+    collected: "13.000", // Ubah ke angka mentah bibit (string)
+    status: "Aktif", // Tambahkan status
   },
   {
     id: 3,
@@ -34,8 +35,8 @@ const PROGRAM_DATA = [
       "Dukung pemulihan kawasan resapan air melalui penanaman vegetasi dan penguatan ekosistem daerah tangkapan air.",
     image:
       "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
-    collected: 95000000,
-    target: 150000000,
+    collected: "9.500", // Ubah ke angka mentah bibit (string)
+    status: "Aktif", // Tambahkan status
   },
   {
     id: 4,
@@ -45,8 +46,8 @@ const PROGRAM_DATA = [
       "Mari berkontribusi dalam pemulihan lahan kritis di wilayah pegunungan untuk mendukung keseimbangan lingkungan.",
     image:
       "https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?auto=format&fit=crop&w=1200&q=80",
-    collected: 78000000,
-    target: 120000000,
+    collected: "7.800", // Ubah ke angka mentah bibit (string)
+    status: "Aktif", // Tambahkan status
   },
 ];
 
@@ -68,16 +69,14 @@ const DonasiExplore: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-customWhite">
-      <main className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-30 lg:px-12">
-        
+      <main className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-20 lg:px-12">
         {/* Heading + Search */}
         <section className="mb-8 md:mb-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            
             {/* Title */}
             <div className="max-w-3xl">
-              <h1 className="text-2xl font-semibold leading-tight text-primary md:text-4xl">
-                Temukan Opsi Donasi yang Tepat: Dukung Rehabilitasi Hutan Sekarang
+              <h1 className="text-2xl font-semibold leading-tight text-primary md:text-4xl mt-4 ">
+                Jelajahi Program
               </h1>
               <p className="mt-3 text-sm text-primary/80 md:text-base">
                 Berikut kami sediakan donasi yang tersedia saat ini
@@ -97,7 +96,6 @@ const DonasiExplore: React.FC = () => {
                 />
               </div>
             </div>
-
           </div>
         </section>
 
@@ -106,7 +104,17 @@ const DonasiExplore: React.FC = () => {
           {filteredPrograms.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-2">
               {filteredPrograms.map((program) => (
-                <ProgramCard key={program.id} {...program} onClick={() => navigate(`/donasi/detail/${program.id}`)}/>
+                <ProgramCard
+                  key={program.id}
+                  id={program.id} 
+                  title={program.title}
+                  location={program.location}
+                  description={program.description}
+                  image={program.image}
+                  collected={program.collected}
+                  status={program.status as "Aktif" | "Non-Aktif"} // Tetapkan status dari data mock
+                  onClick={() => navigate(`/donasi/detail/${program.id}`)} // Tetap gunakan prop onClick untuk navigasi
+                />
               ))}
             </div>
           ) : (
@@ -117,7 +125,6 @@ const DonasiExplore: React.FC = () => {
             </div>
           )}
         </section>
-
       </main>
     </div>
   );

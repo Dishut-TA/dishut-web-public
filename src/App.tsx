@@ -10,6 +10,8 @@ import AuthLayout from './components/layout/AuthLayout';
 import Donation from './pages/Donation';
 import DonasiExplore from './pages/Donation/sections/DonasiExplore';
 import DonasiDetail from './pages/Donation/sections/DonasiDetail';
+import Investation from './pages/Investation';
+import InvestmentExplore from './pages/Investation/sections/InvestmentExplore';
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
           <Route path="/donasi" element={<Donation />} />
           <Route path="/donasi/explore" element={<DonasiExplore />} />
           <Route path="/donasi/detail/:id" element={<DonasiDetail />} />
+          <Route path="/investasi" element={<Investation />} />
+          <Route path="/investasi/explore" element={<InvestmentExplore />} />
         </Route>
 
         {/* 404 Page */}
