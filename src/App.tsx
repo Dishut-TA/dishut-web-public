@@ -12,6 +12,8 @@ import DonasiExplore from './pages/Donation/sections/DonasiExplore';
 import DonasiDetail from './pages/Donation/sections/DonasiDetail';
 import Investation from './pages/Investation';
 import InvestmentExplore from './pages/Investation/sections/InvestmentExplore';
+import Pemetaan from './pages/Pemetaan';
+import InvestmentDetail from './pages/Investation/sections/InvestmentDetail';
 
 function App() {
   return (
@@ -34,6 +36,7 @@ function App() {
           <Route path="/donasi/detail/:id" element={<DonasiDetail />} />
           <Route path="/investasi" element={<Investation />} />
           <Route path="/investasi/explore" element={<InvestmentExplore />} />
+          <Route path="/investasi/detail/:id" element={<InvestmentDetail />} />
         </Route>
 
         {/* 404 Page */}
