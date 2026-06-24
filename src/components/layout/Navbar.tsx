@@ -8,7 +8,7 @@ const menus = [
   { label: "Monitoring", path: "/monitoring" },
   { label: "Donasi", path: "/donasi" },
   { label: "Investasi", path: "/investasi" },
-  { label: "Tentang Kami", path: "/tentang-kami" },
+  // { label: "Tentang Kami", path: "/tentang-kami" },
 ];
 
 const Navbar = () => {
