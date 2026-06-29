@@ -1,50 +1,73 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FcGoogle } from "react-icons/fc";
 import InputField from '@/components/InputField';
 import PasswordField from '@/components/PasswordField';
-import Alert from '@/components/Alert';
-import BG from '@/assets/images/Login.png';
 import Button from "@/components/Button";
-import { FcGoogle } from "react-icons/fc";
+import { loginUser } from '@/services/auth.service';
+import { ToastError, ToastSuccess } from '@/utils/toast';
+import type { LoginFormData, FormErrors } from '@/utils/interface';
+import BG from '@/assets/images/Login.png';
+import { useAuth } from '@/context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
+  const { setUser } = useAuth();
+  const [form, setForm] = useState<LoginFormData>({ 
+    email: '', 
+    password: '' 
   });
-
-  const [errors, setErrors] = useState<any>({});
-  const [status, setStatus] = useState<'success' | 'error' | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    
+    if (errors[e.target.name as keyof FormErrors]) {
+      setErrors({ ...errors, [e.target.name]: '' });
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let newErrors: any = {};
+    setErrors({});
+    
+    if (!form.email || !form.password) {
+      setErrors({ message: 'Email dan kata sandi wajib diisi' });
+      ToastError('Mohon isi email dan kata sandi');
+      return;
+    }
 
-    if (!form.email) newErrors.email = 'Email wajib diisi';
-    if (!form.password) newErrors.password = 'Kata sandi wajib diisi';
+    setIsLoading(true);
 
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      if (form.email === 'admin@example.com' && form.password === '123456') {
-        setStatus('success');
-      } else {
-        setStatus('error');
-        setErrors({ password: 'Kata Sandi Salah' });
-      }
-    } else {
-      setStatus('error');
+    try {
+      const response = await loginUser(form.email, form.password);
+      
+      // 1. Simpan ke LocalStorage
+      localStorage.setItem('token', response.payload.token);
+      localStorage.setItem('user', JSON.stringify(response.payload.user));
+      
+      // 2. Update Global State Context (Penting agar Navbar mendeteksi perubahan seketika)
+      setUser(response.payload.user);
+      
+      // 3. Tampilkan Pesan Sukses
+      ToastSuccess('Login Berhasil! Selamat datang.');
+      
+      // 4. Redirect
+      setTimeout(() => navigate('/'), 800);
+      
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Email atau Kata Sandi Salah';
+      ToastError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
+    <div className="flex min-h-screen flex-col md:flex-row pt-20 md:pt-0"> 
+      {/* Catatan: pt-20 ditambahkan agar form login tidak tertutup oleh navbar yang posisinya absolute */}
+      
       <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
         <form
           className="w-full max-w-md p-6 md:p-8 rounded-2xl"
@@ -53,16 +76,9 @@ const Login = () => {
           <h2 className="text-2xl font-bold text-primary text-center mb-2">
             Selamat Datang Kembali
           </h2>
-          <p className="text-center text-primary mb-6">
+          <p className="text-center text-primary mb-6 text-sm">
             Silakan Masukkan Akunmu
           </p>
-
-          {status === 'error' && (
-            <Alert type="error" message="Email atau Kata Sandi Salah" />
-          )}
-          {status === 'success' && (
-            <Alert type="success" message="Login Berhasil!" />
-          )}
 
           <InputField
             label="Email"
@@ -83,19 +99,23 @@ const Login = () => {
             placeholder="Masukkan kata sandi"
           />
 
-          {/* FORGOT PASSWORD */}
           <p
             onClick={() => navigate('/forgot-password')}
-            className="text-right text-sm mt-1 text-primary font-semibold cursor-pointer hover:underline"
+            className="text-right text-sm mt-2 text-primary font-semibold cursor-pointer hover:underline"
           >
             Lupa Kata Sandi?
           </p>
 
           <button
             type="submit"
-            className="w-full bg-primary text-white transition-all cursor-pointer p-4 rounded-full mt-4 hover:bg-tertiary"
+            disabled={isLoading}
+            className={`w-full text-white font-semibold transition-all p-4 rounded-full mt-6 
+              ${isLoading 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-primary hover:bg-tertiary cursor-pointer shadow-md hover:shadow-lg'
+              }`}
           >
-            Masuk
+            {isLoading ? 'Sedang Memproses...' : 'Masuk'}
           </button>
 
           <p className="text-center text-sm mt-4 text-primary">
@@ -108,28 +128,27 @@ const Login = () => {
             </span>
           </p>
 
-          {/* DIVIDER */}
           <div className="flex items-center my-6">
-            <div className="grow h-px bg-customBlack"></div>
-            <span className="mx-3 text-customBlack text-sm">Or</span>
-            <div className="grow h-px bg-customBlack"></div>
+            <div className="grow h-px bg-gray-200"></div>
+            <span className="mx-3 text-gray-400 text-sm">Atau</span>
+            <div className="grow h-px bg-gray-200"></div>
           </div>
 
-          {/* LOGIN WITH GOOGLE */}
           <Button
             variant="outline"
             fullWidth
             size="lg"
             leftIcon={<FcGoogle size={20} />}
             onClick={() => console.log("Login with Google")}
-            className='font-semibold'
+            className='font-semibold py-3 flex justify-center items-center gap-2'
           >
-            Login with Google
+            Login dengan Google
           </Button>
         </form>
       </div>
+
       <div className="hidden md:block md:w-1/2 bg-secondary">
-        <img src={BG} alt="" />
+        <img src={BG} alt="Login Background" className="w-full h-full object-cover" />
       </div>
     </div>
   );
