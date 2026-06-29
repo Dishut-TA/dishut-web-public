@@ -14,20 +14,21 @@ import Investation from './pages/Investation';
 import InvestmentExplore from './pages/Investation/sections/InvestmentExplore';
 import Pemetaan from './pages/Pemetaan';
 import InvestmentDetail from './pages/Investation/sections/InvestmentDetail';
+import { Toaster } from 'sonner';
+import TransactionHistory from './pages/TransactionHistory';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
     <Router>
       <Routes>
 
-        {/* AUTH (tanpa navbar) */}
         <Route element={<AuthLayout />}>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
         </Route>
 
-        {/* MAIN APP (pakai navbar) */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/pemetaan" element={<Pemetaan />} />
@@ -37,11 +38,11 @@ function App() {
           <Route path="/investasi" element={<Investation />} />
           <Route path="/investasi/explore" element={<InvestmentExplore />} />
           <Route path="/investasi/detail/:id" element={<InvestmentDetail />} />
+          <Route path="/riwayat-transaksi" element={<TransactionHistory />} />
         </Route>
-
-        {/* 404 Page */}
-
+        <Route path="*" element={<NotFound />} />
       </Routes>
+      <Toaster position="top-center" richColors />
     </Router>
   );
 }
