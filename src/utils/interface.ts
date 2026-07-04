@@ -4,6 +4,9 @@ export interface User {
   email: string;
   nip: string;
   foto?: string;
+  no_telepon?: string;
+  tanggal_lahir?: string;
+  alamat?: string;
 }
 
 export interface LoginFormData {

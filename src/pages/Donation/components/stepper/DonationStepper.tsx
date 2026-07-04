@@ -5,21 +5,27 @@ import DonationIdentityStep from "./DonationIdentityStep";
 import DonationAmountStep from "./DonationAmountStep";
 import DonationPaymentStep from "./DonationPaymentStep";
 
+export interface SelectedBibit {
+  id: string;
+  label: string;
+  price: number;
+  quantity: number;
+}
+
 export interface DonationFormData {
   name: string;
-  email: string;
-  phone: string;
   amount: string;
-  jenisBibit: string;
-  jumlahBibit: string;
+  selectedBibits: SelectedBibit[];
   paymentMethod: string;
   virtualAccount: string;
+  proofFile: File | null;
 }
 
 interface DonationStepperProps {
   currentStep: number;
   formData: DonationFormData;
-  onChange: (field: keyof DonationFormData, value: string) => void;
+  isSubmitting?: boolean;
+  onChange: (field: keyof DonationFormData, value: any) => void;
   onNext: () => void;
   onBack: () => void;
   onCheckStatus: () => void;
@@ -29,13 +35,14 @@ const STEP_ITEMS = ["Identitas", "Donasi", "Pembayaran"] as const;
 
 const stepTitleMap: Record<number, string> = {
   1: "Masukan Data Identitas",
-  2: "Pilih Metode Pembayaran",
-  3: "Pembayaran Donasi Berhasil",
+  2: "Pilih Bibit & Pembayaran",
+  3: "Pembayaran Donasi",
 };
 
 const DonationStepper: React.FC<DonationStepperProps> = ({
   currentStep,
   formData,
+  isSubmitting,
   onChange,
   onNext,
   onBack,
@@ -55,18 +62,15 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
         {currentStep === 1 && (
           <DonationIdentityStep
             name={formData.name}
-            email={formData.email}
-            phone={formData.phone}
-            onChange={(field, value) => onChange(field, value)}
+            onChange={onChange}
           />
         )}
 
         {currentStep === 2 && (
           <DonationAmountStep
-            jenisBibit={formData.jenisBibit}
-            jumlahBibit={formData.jumlahBibit}
+            selectedBibits={formData.selectedBibits}
             paymentMethod={formData.paymentMethod}
-            onChange={(field, value) => onChange(field, value)}
+            onChange={onChange}
           />
         )}
 
@@ -75,6 +79,8 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
             amount={formData.amount}
             paymentMethod={formData.paymentMethod}
             virtualAccount={formData.virtualAccount}
+            proofFile={formData.proofFile}
+            onChange={onChange}
           />
         )}
 
@@ -104,6 +110,7 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
                 size="md"
                 className="w-full"
                 onClick={onNext}
+                disabled={formData.selectedBibits.length === 0}
               />
             </>
           )}
@@ -116,13 +123,15 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
                 size="md"
                 className="w-full"
                 onClick={onBack}
+                disabled={isSubmitting}
               />
               <Button
-                label="Cek Status"
+                label={isSubmitting ? "Memproses..." : "Konfirmasi Pembayaran"}
                 variant="primary"
                 size="md"
-                className="w-full"
+                className={`w-full ${isSubmitting ? 'bg-gray-400 cursor-not-allowed border-none' : ''}`}
                 onClick={onCheckStatus}
+                disabled={!formData.proofFile || isSubmitting}
               />
             </>
           )}

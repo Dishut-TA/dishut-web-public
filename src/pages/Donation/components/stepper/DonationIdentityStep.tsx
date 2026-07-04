@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
+import { type DonationFormData } from "./DonationStepper";
 
 interface DonationIdentityStepProps {
   name: string;
-  email: string;
-  phone: string;
-  onChange: (field: "name" | "email" | "phone", value: string) => void;
+  onChange: (field: keyof DonationFormData, value: any) => void;
 }
 
 const inputClassName =
@@ -12,50 +11,49 @@ const inputClassName =
 
 const DonationIdentityStep: React.FC<DonationIdentityStepProps> = ({
   name,
-  email,
-  phone,
   onChange,
 }) => {
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(name === "Orang Baik");
+
+  const handleAnonymousChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setIsAnonymous(checked);
+    if (checked) {
+      onChange("name", "Orang Baik");
+    } else {
+      onChange("name", "");
+    }
+  };
+
   return (
     <div className="space-y-5">
-      <div>
-        <label className="mb-2 block text-sm font-medium text-primary">
-          Nama
-        </label>
+      <div className="flex items-center gap-3">
         <input
-          type="text"
-          placeholder="Input Nama"
-          value={name}
-          onChange={(e) => onChange("name", e.target.value)}
-          className={inputClassName}
+          type="checkbox"
+          id="anonymous"
+          checked={isAnonymous}
+          onChange={handleAnonymousChange}
+          className="h-5 w-5 rounded border-[#98C98A] text-primary focus:ring-primary accent-[#98C98A] cursor-pointer"
         />
+        <label htmlFor="anonymous" className="text-sm font-medium text-primary cursor-pointer">
+          Donasi tanpa identitas (Sembunyikan nama)
+        </label>
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-primary">
-          Email
-        </label>
-        <input
-          type="email"
-          placeholder="Cth: example@email.com"
-          value={email}
-          onChange={(e) => onChange("email", e.target.value)}
-          className={inputClassName}
-        />
-      </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-medium text-primary">
-          No. Telepon
-        </label>
-        <input
-          type="tel"
-          placeholder="Cth: 08xxxxxxxxxx"
-          value={phone}
-          onChange={(e) => onChange("phone", e.target.value)}
-          className={inputClassName}
-        />
-      </div>
+      {!isAnonymous && (
+        <div>
+          <label className="mb-2 block text-sm font-medium text-primary">
+            Nama Lengkap
+          </label>
+          <input
+            type="text"
+            placeholder="Input Nama"
+            value={name === "Orang Baik" ? "" : name}
+            onChange={(e) => onChange("name", e.target.value)}
+            className={inputClassName}
+          />
+        </div>
+      )}
     </div>
   );
 };
