@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { HiSearch } from 'react-icons/hi';
 import TransactionTable from './components/TransactionTable';
 import EmptyState from './components/EmptyState';
 import DetailModal from './components/DetailModal';
+import { ToastSuccess } from '@/utils/toast'; // Opsional jika ingin pakai toast saat export
 import type { TransactionData } from '@/utils/interface';
 
 const mockInvestasi: TransactionData[] = [
@@ -30,14 +32,47 @@ const mockInvestasi: TransactionData[] = [
   },
 ];
 
-const mockDonasi: TransactionData[] = [];
+// Menambahkan Mock Data Donasi sesuai gambar
+const mockDonasi: TransactionData[] = [
+  {
+    id: '#D0001', // Tetap ada id di data untuk keperluan key react, tapi tidak ditampilkan di tabel
+    activityName: 'Penanaman Reboisasi Blok Gunung Cikuray',
+    date: '02/02/2026',
+    status: 'Sudah Dibayar',
+    amount: 200000,
+    userName: 'Raisha Nabila',
+    userPhone: '0895320343049',
+    userEmail: 'raisha@gmail.com',
+    paymentMethod: 'Bank Central Asia (BCA)'
+  },
+  {
+    id: '#D0002',
+    activityName: 'Penanaman Reboisasi Blok Gunung Cikuray',
+    date: '02/02/2026',
+    status: 'Sudah Dibayar',
+    amount: 200000,
+    userName: 'Raisha Nabila',
+    userPhone: '0895320343049',
+    userEmail: 'raisha@gmail.com',
+    paymentMethod: 'Bank Central Asia (BCA)'
+  }
+];
 
 const TransactionHistory = () => {
-  const [activeTab, setActiveTab] = useState<'donasi' | 'investasi'>('investasi');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<'donasi' | 'investasi'>(
+    location.state?.defaultTab || 'investasi'
+  );
   const [searchQuery, setSearchQuery] = useState('');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
+
+  useEffect(() => {
+    if (location.state?.defaultTab) {
+      setActiveTab(location.state.defaultTab);
+    }
+  }, [location.state]);
 
   const currentData = activeTab === 'investasi' ? mockInvestasi : mockDonasi;
 
@@ -51,8 +86,13 @@ const TransactionHistory = () => {
     setIsModalOpen(true);
   };
 
+  const handleExportData = (item: TransactionData) => {
+    console.log("Exporting data for:", item.activityName);
+    ToastSuccess("Mendownload data transaksi...");
+  };
+
   return (
-    <div className="min-h-screen bg-customWhite pt-28 pb-12 px-4 md:px-8">
+    <div className="bg-customWhite">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-primary">
@@ -100,12 +140,12 @@ const TransactionHistory = () => {
               data={filteredData} 
               type={activeTab} 
               onViewDetail={handleViewDetail} 
+              onExportData={handleExportData} // Pass handler export
             />
           ) : (
             <EmptyState type={activeTab} />
           )}
         </div>
-
       </div>
 
       <DetailModal 

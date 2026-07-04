@@ -4,17 +4,18 @@ import Button from "@/components/Button";
 import { MdLocationOn } from "react-icons/md";
 import { PiLeafFill } from "react-icons/pi";
 import DonationStepper, { type DonationFormData } from "./stepper/DonationStepper";
+import { useNavigate } from "react-router-dom";
+import { ToastError, ToastSuccess } from "@/utils/toast";
 
 interface ProgramSummaryCardProps {
   title: string;
   location: string;
   image: string;
-  collected: number; // Angka jumlah bibit terkumpul
-  target: number;    // Angka target bibit
+  collected: number;
+  target: number;
   status: "Aktif" | "Non-Aktif";
 }
 
-// Format angka biasa dengan pemisah ribuan (contoh: 13000 jadi 13.000)
 const formatNumber = (num: number) =>
   new Intl.NumberFormat("id-ID").format(num);
 
@@ -30,22 +31,25 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
   target,
   status,
 }) => {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-const [formData, setFormData] = useState<DonationFormData>({
-  name: "", email: "", phone: "",
-  jenisBibit: "Mahoni", // Tambahan baru
-  jumlahBibit: "",      // Tambahan baru
-  amount: "0", paymentMethod: "", virtualAccount: "",
-});
+  const [formData, setFormData] = useState<DonationFormData>({
+    name: "",
+    amount: "0",
+    selectedBibits: [], // Diperbarui untuk mendukung multi-bibit
+    paymentMethod: "",
+    virtualAccount: "",
+    proofFile: null, // Diperbarui untuk file bukti transfer
+  });
 
-  // Kalkulasi progress berdasarkan bibit
   const progress = useMemo(
     () => Math.min((collected / target) * 100, 100),
     [collected, target]
   );
 
-  const handleChange = (field: keyof DonationFormData, value: string) => {
+  const handleChange = (field: keyof DonationFormData, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -79,12 +83,36 @@ const [formData, setFormData] = useState<DonationFormData>({
     }
   };
 
-  const handleCheckStatus = () => {
-    console.log("Check payment status:", {
-      amount: formData.amount,
-      paymentMethod: formData.paymentMethod,
-      virtualAccount: formData.virtualAccount,
-    });
+  // const handleCheckStatus = () => {
+  //   console.log("Submit Donasi:", {
+  //     name: formData.name,
+  //     amount: formData.amount,
+  //     bibit: formData.selectedBibits,
+  //     paymentMethod: formData.paymentMethod,
+  //     virtualAccount: formData.virtualAccount,
+  //     proofFile: formData.proofFile?.name,
+  //   });
+  //   alert("Donasi berhasil dikirim!");
+  //   // setIsFlipped(false); // Bisa di un-comment jika ingin menutup form setelah sukses
+  // };
+
+  const handleSubmitDonasi = async () => {
+    if (!formData.proofFile) {
+      ToastError("Harap unggah bukti pembayaran terlebih dahulu.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      ToastSuccess("Donasi berhasil dibuat! Menunggu konfirmasi admin.");
+      navigate('/riwayat-transaksi', { state: { defaultTab: 'donasi' } });
+      
+    } catch (error) {
+      ToastError("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const generateVirtualAccount = () => {
@@ -126,7 +154,6 @@ const [formData, setFormData] = useState<DonationFormData>({
                 <span>{location}</span>
               </div>
 
-              {/* Progress Bar & Info Bibit */}
               <div className="mt-4">
                 <div className="mb-2 flex items-center justify-between text-sm text-primary">
                   <div className="flex items-center gap-1">
@@ -176,7 +203,8 @@ const [formData, setFormData] = useState<DonationFormData>({
               onChange={handleChange}
               onNext={handleNext}
               onBack={handleBack}
-              onCheckStatus={handleCheckStatus}
+              onCheckStatus={handleSubmitDonasi}
+              isSubmitting={isSubmitting}
             />
           </motion.div>
         )}

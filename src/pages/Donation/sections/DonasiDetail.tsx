@@ -4,7 +4,6 @@ import AllocationTable, { type AllocationItem } from "../components/AllocationTa
 import DonorList from "../components/DonorList";
 import ProgramSummaryCard from "../components/ProgramSummaryCard";
 
-// Sesuaikan data mock
 const donationDetail = {
   id: 1,
   title: "Rehabilitasi Hutan DAS Cimanuk",
@@ -14,13 +13,12 @@ const donationDetail = {
   
   collectedBibit: 13000, 
   targetBibit: 20000,
-  collectedDana: 1200000, // Total donasi terkumpul dalam Rupiah (seperti di gambar)
+  collectedDana: 1200000,
   status: "Aktif",
   
   donorCount: 20,
   remainingDays: 25,
   
-  // Data alokasi disesuaikan dengan gambar UI
   allocationTitle: "Alokasi Dana (100% Pembelian Bibit)",
   allocations: [
     {
@@ -30,42 +28,13 @@ const donationDetail = {
       amount: 1200000,
       isStrikethrough: false,
     },
-    {
-      id: 2,
-      label: "Operasional Platform / BPDAS",
-      percentage: 0,
-      amount: 0,
-      isStrikethrough: true,
-    },
-    {
-      id: 3,
-      label: "Biaya Perawatan oleh KTH",
-      percentage: 0,
-      customValueText: "Ditanggung Pemerintah",
-      isStrikethrough: true,
-    },
   ] as AllocationItem[],
 };
 
 const donors = [
-  {
-    id: 1,
-    name: "Raisha Nabila",
-    amount: 20000,
-    timeAgo: "15 menit yang lalu",
-  },
-  {
-    id: 2,
-    name: "Muhamein Iskandar",
-    amount: 10000,
-    timeAgo: "25 menit yang lalu",
-  },
-  {
-    id: 3,
-    name: "Debora Ananta",
-    amount: 10000,
-    timeAgo: "30 menit yang lalu",
-  },
+  { id: 1, name: "Raisha Nabila", amount: 20000, timeAgo: "15 menit yang lalu" },
+  { id: 2, name: "Muhamein Iskandar", amount: 10000, timeAgo: "25 menit yang lalu" },
+  { id: 3, name: "Debora Ananta", amount: 10000, timeAgo: "30 menit yang lalu" },
 ];
 
 const DonasiDetail: React.FC = () => {
@@ -110,7 +79,6 @@ const DonasiDetail: React.FC = () => {
               </button>
             </div>
 
-            {/* Bagian Alokasi Dana */}
             <div className="mt-10">
                 <AllocationTable
                 title={donationDetail.allocationTitle}
