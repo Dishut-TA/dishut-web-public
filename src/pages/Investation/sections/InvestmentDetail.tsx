@@ -1,16 +1,18 @@
 import React, { useState } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { HiOutlineDocumentDownload } from "react-icons/hi";
+import { FiChevronLeft, FiChevronRight, FiShare2 } from "react-icons/fi";
 import { HiOutlineUserGroup, HiOutlineCalendar, HiOutlineChartPie } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
-import { FaLock } from "react-icons/fa6";
 import { AnimatePresence, motion, type Transition } from "framer-motion";
+import { ToastSuccess } from "@/utils/toast";
 import StepperIndicator from "../components/stepper/StepperIndicator";
 import Step1Identity from "../components/stepper/Step1Identity";
 import Step2Investment from "../components/stepper/Step2Investment";
 import Step3Payment from "../components/stepper/Step3Payment";
 import Step4Success from "../components/stepper/Step4Success";
-import AgreementWarningModal from "../components/AgreementWarningModal"; 
+import TabDetail from "../components/TabDetail";
+import TabPanduan from "../components/TabPanduan";
+import TabDokumen from "../components/TabDokumen";
+import AgreementWarningModal from "../components/AgreementWarningModal";
 
 const cardTransition: Transition = { duration: 0.6, ease: [0.22, 1, 0.36, 1] };
 
@@ -19,6 +21,7 @@ const InvestmentDetail: React.FC = () => {
   const [step, setStep] = useState(1);
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'detail' | 'panduan' | 'dokumen'>('detail');
 
   const handleInvestClick = () => {
     if (!hasDownloaded) {
@@ -33,138 +36,150 @@ const InvestmentDetail: React.FC = () => {
     setTimeout(() => setStep(1), 500); 
   };
 
+  const handleShareClick = () => {
+    navigator.clipboard.writeText(window.location.href);
+    ToastSuccess("Link tautan berhasil disalin ke clipboard!");
+  };
+
   return (
-    <div className="min-h-screen bg-[#F5F7F5] py-10 px-5 md:px-8 lg:px-12 font-sans overflow-x-hidden">
-      <div className="max-w-300 mx-auto">
+    <div className="min-h-screen bg-[#F5F7F5] pt-28 pb-12 px-5 md:px-8 lg:px-12 font-sans overflow-x-hidden">
+      <div className="max-w-7xl mx-auto">
         <button 
           onClick={isFlipped ? handleCancel : undefined}
-          className="flex items-center gap-1 text-[#2E7D32] font-semibold text-sm hover:underline mb-8 transition-all"
+          className="flex items-center gap-1 text-[#2E7D32] font-semibold text-sm hover:underline mb-6 md:mb-8 transition-all"
         >
           <FiChevronLeft className="text-lg" /> {isFlipped ? "Batal Investasi" : "Kembali"}
         </button>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-          <div className="flex flex-col">
-            {isFlipped && (
-              <motion.div 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full aspect-4/3] d:aspect-3/2] ounded-2xl overflow-hidden shadow-sm mb-6"
-              >
-                <img 
-                  src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1000&q=80" 
-                  alt="Ekowisata Rimba Pinus" 
-                  className="w-full h-full object-cover rounded-2xl"
-                />
-              </motion.div>
-            )}
 
-            <h1 className="text-3xl md:text-[32px] font-bold text-primary mb-4">
-              Ekowisata Rimba Pinus
-            </h1>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          <div className="lg:col-span-7 flex flex-col w-full order-2 lg:order-1">
+            <div className="w-full aspect-16/10 sm:aspect-video rounded-3xl overflow-hidden shadow-md mb-4 bg-gray-200">
+              <img 
+                src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1000&q=80" 
+                alt="Ekowisata Rimba Pinus" 
+                className="w-full h-full object-cover"
+              />
+            </div>
             
-            <p className="text-[#4F6352] text-sm md:text-[15px] leading-relaxed mb-8">
-              Lorem ipsum dolor sit amet consectetur. Sed arcu elementum eu feugiat 
-              mattis posuere. Tempus quis consequat in amet. Commodo dignissim sed 
-              tellus mi. Rhoncus lectus habitant leo urna et tortor nunc velit accumsan. 
-              Adipiscing sed turpis sit aliquet dictum iaculis posuere a.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-2 mb-8 text-[#828282] text-sm font-medium">
-              <div className="flex items-center gap-2">
-                <TbTargetArrow className="text-lg" /> 
-                <span>Minimal Invest Rp 100.000</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <HiOutlineUserGroup className="text-lg" /> 
-                <span>8 Orang Sudah Berinvestasi</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <HiOutlineChartPie className="text-lg" /> 
-                <span>Presentase Keuntungan 60:40</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <HiOutlineCalendar className="text-lg" /> 
-                <span>Dikelola Selama 48 Bulan</span>
-              </div>
+            <div className="grid grid-cols-3 gap-3 md:gap-4 mb-8">
+              <div className="bg-[#D9D9D9] rounded-xl aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
+              <div className="bg-[#D9D9D9] rounded-xl aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
+              <div className="bg-[#D9D9D9] rounded-xl aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
             </div>
 
-            <div className="bg-[#D5ECD8] rounded-xl p-5 mb-8">
-              <div className="flex items-center gap-2 text-primary font-bold text-[15px] mb-1.5">
-                <FaLock className="text-sm" />
-                <span>BAGI HASIL: 60% KTH | 40% INVESTOR</span>
+            <div className="flex items-center justify-between pb-2 mb-6 text-sm font-semibold text-[#828282] gap-4">
+              <div className="flex gap-4 md:gap-6 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1 pb-1">
+                <button 
+                  onClick={() => setActiveTab('detail')} 
+                  className={`transition-all cursor-pointer ${activeTab === 'detail' ? 'text-primary border-b-2 border-primary font-bold' : 'hover:text-primary'}`}
+                >
+                  Detail Investasi
+                </button>
+                <button 
+                  onClick={() => setActiveTab('panduan')} 
+                  className={`transition-all cursor-pointer ${activeTab === 'panduan' ? 'text-primary border-b-2 border-primary font-bold' : 'hover:text-primary'}`}
+                >
+                  Panduan & Informasi
+                </button>
+                <button 
+                  onClick={() => setActiveTab('dokumen')} 
+                  className={`transition-all cursor-pointer ${activeTab === 'dokumen' ? 'text-primary border-b-2 border-primary font-bold' : 'hover:text-primary'}`}
+                >
+                  Dokumen
+                </button>
               </div>
-              <p className="text-xs text-[#4F6352] leading-relaxed">
-                Rasio dikunci sesuai standar kelayakan Dinas Kehutanan Jawa Barat 
-                untuk menjamin kesejahteraan petani dan keberlanjutan ekosistem.
-              </p>
+
+              <button 
+                onClick={handleShareClick}
+                className="flex items-center shrink-0 gap-1.5 text-primary hover:text-secondary font-bold cursor-pointer"
+              >
+                <span className="hidden sm:block">Bagikan</span> <FiShare2 size={18} />
+              </button>
             </div>
 
-            {!isFlipped && (
-              <div className="flex flex-col gap-4">
-                <button 
-                  onClick={() => setHasDownloaded(true)}
-                  className={`w-full py-3.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 transition-colors
-                    ${hasDownloaded 
-                      ? "bg-gray-100 text-primary border-2 border-primary" 
-                      : "bg-tertiary text-white hover:bg-[#483e14]"}`}
-                >
-                  <HiOutlineDocumentDownload className="text-xl" /> 
-                  {hasDownloaded ? "Template Sudah Diunduh" : "Unduh Template Perjanjian Investor"}
-                </button>
-                
-                <button 
-                  onClick={handleInvestClick}
-                  className="w-full py-3.5 bg-primary text-white rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#76BC7D] transition-colors shadow-sm"
-                >
-                  Investasi Sekarang <FiChevronRight className="text-lg" />
-                </button>
-              </div>
-            )}
+            <div className="min-h-37.5 pb-10 lg:pb-0">
+              {activeTab === 'detail' && <TabDetail />}
+              {activeTab === 'panduan' && <TabPanduan />}
+              {activeTab === 'dokumen' && <TabDokumen onDownloadTemplate={() => setHasDownloaded(true)} />}
+            </div>
           </div>
 
-          <motion.div style={{ perspective: 1200 }} className="w-full sticky top-10">
-            <AnimatePresence mode="wait">
-              {!isFlipped ? (
-                <motion.div 
-                  key="front" 
-                  exit={{ rotateY: -90, opacity: 0 }} 
-                  transition={cardTransition}
-                  className="flex flex-col gap-4 w-full origin-center"
-                >
-                  <div className="w-full aspect-4/3 md:aspect-3/2 rounded-2xl overflow-hidden shadow-sm">
-                    <img 
-                      src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1000&q=80" 
-                      alt="Ekowisata Rimba Pinus" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-[#D9D9D9] rounded-lg aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
-                    <div className="bg-[#D9D9D9] rounded-lg aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
-                    <div className="bg-[#D9D9D9] rounded-lg aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div 
-                  key="back" 
-                  initial={{ rotateY: 90, opacity: 0 }} 
-                  animate={{ rotateY: 0, opacity: 1 }} 
-                  transition={cardTransition}
-                  className="w-full bg-[#D5ECD8] rounded-3xl p-6 md:p-8 origin-center"
-                >
-                  {step <= 3 && <StepperIndicator currentStep={step} />}
-                  <div className="mt-2">
-                    {step === 1 && <Step1Identity onNext={() => setStep(2)} />}
-                    {step === 2 && <Step2Investment onNext={() => setStep(3)} onBack={() => setStep(1)} />}
-                    {step === 3 && <Step3Payment onNext={() => setStep(4)} onBack={() => setStep(2)} />}
-                    {step === 4 && <Step4Success />}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+          <div className="lg:col-span-5 w-full lg:sticky order-1 lg:order-2">
+            <div style={{ perspective: 1200 }} className="w-full">
+              <AnimatePresence mode="wait">
+                
+                {!isFlipped ? (
+                  <motion.div 
+                    key="front-info" 
+                    exit={{ rotateY: -90, opacity: 0 }} 
+                    transition={cardTransition}
+                    className="flex flex-col w-full origin-center"
+                  >
+                    <h1 className="text-2xl sm:text-3xl md:text-[36px] font-bold text-primary mb-3 md:mb-4 tracking-tight leading-tight">
+                      Ekowisata Rimba Pinus
+                    </h1>
+                    
+                    <p className="text-[#4F6352] text-sm md:text-[15px] leading-relaxed mb-6 md:mb-8">
+                      Lorem ipsum dolor sit amet consectetur. Sed arcu elementum eu feugiat 
+                      mattis posuere. Tempus quis consequat in amet. Commodo dignissim sed 
+                      tellus mi. Rhoncus lectus habitant leo urna et tortor nunc velit accumsan.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4 mb-6 md:mb-8 text-[#555555] text-xs sm:text-sm font-semibold">
+                      <div className="flex items-center gap-3"><TbTargetArrow className="text-xl shrink-0 text-primary" /> <span>Minimal Invest Rp 100.000</span></div>
+                      <div className="flex items-center gap-3"><HiOutlineUserGroup className="text-xl shrink-0 text-primary" /> <span>8 Orang Sudah Berinvestasi</span></div>
+                      <div className="flex items-center gap-3"><HiOutlineChartPie className="text-xl shrink-0 text-primary" /> <span>Presentase Keuntungan 60:40</span></div>
+                      <div className="flex items-center gap-3"><HiOutlineCalendar className="text-xl shrink-0 text-primary" /> <span>Dikelola Selama 48 Bulan</span></div>
+                    </div>
+
+                    <div className="mb-6 md:mb-8">
+                      <div className="flex justify-between items-center mb-2 font-bold text-sm text-gray-700">
+                        <span>Target Terkumpul</span>
+                        <span className="text-primary text-base">90%</span>
+                      </div>
+                      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden mb-3">
+                        <div className="h-full bg-primary rounded-full" style={{ width: '90%' }}></div>
+                      </div>
+                      <div className="flex justify-between text-xs font-bold text-gray-400">
+                        <div>
+                          <p className="uppercase tracking-wider text-[10px] sm:text-[11px] mb-0.5">Terkumpul</p>
+                          <p className="text-primary text-sm sm:text-base font-bold">Rp 450.000.000</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="uppercase tracking-wider text-[10px] sm:text-[11px] mb-0.5">Dari Target</p>
+                          <p className="text-gray-600 text-sm sm:text-base font-bold">Rp 500.000.000</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={handleInvestClick}
+                      className="w-full py-3.5 sm:py-4 bg-primary text-white rounded-full text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:bg-[#144a18] transition-all shadow-md active:scale-[0.98]"
+                    >
+                      Investasi Sekarang <FiChevronRight className="text-xl" />
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    key="back-stepper" 
+                    initial={{ rotateY: 90, opacity: 0 }} 
+                    animate={{ rotateY: 0, opacity: 1 }} 
+                    transition={cardTransition}
+                    className="w-full bg-[#D5ECD8] rounded-3xl p-5 sm:p-6 md:p-8 origin-center shadow-md overflow-hidden"
+                  >
+                    {step <= 3 && <StepperIndicator currentStep={step} />}
+                    <div className="mt-2 md:mt-4">
+                      {step === 1 && <Step1Identity onNext={() => setStep(2)} />}
+                      {step === 2 && <Step2Investment onNext={() => setStep(3)} onBack={() => setStep(1)} />}
+                      {step === 3 && <Step3Payment onNext={() => setStep(4)} onBack={() => setStep(2)} />}
+                      {step === 4 && <Step4Success />}
+                    </div>
+                  </motion.div>
+                )}
+
+              </AnimatePresence>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -172,12 +187,12 @@ const InvestmentDetail: React.FC = () => {
       <AgreementWarningModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+        onTriggerDownload={() => setHasDownloaded(true)}
         onProceed={() => {
           setIsModalOpen(false);
           setIsFlipped(true); 
         }} 
       />
-
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import AccordionSection from "./section/AccordionSection"
-import CtaKonservasiSection from "./section/CtaKonservasiSection"
+import AksiPartisipasiSection from "./section/AksiPartisipasiSection"
 import DampakProgramSection from "./section/DampakProgramSection"
 import HeroSection from "./section/HeroSection"
 import PetaPrioritasKonservasiSection from "./section/PetaPrioritasKonservasiSection"
-import ProgramKonservasiSection from "./section/ProgramKonservasiSection"
+import QuoteSection from "./section/QuoteSection"
 
 const Home = () => {
   return (
@@ -12,8 +12,8 @@ const Home = () => {
         <DampakProgramSection />
         <PetaPrioritasKonservasiSection />
         <AccordionSection />
-        <ProgramKonservasiSection />
-        <CtaKonservasiSection />
+        <AksiPartisipasiSection /> 
+        <QuoteSection />
     </div>
   )
 }

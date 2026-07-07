@@ -1,24 +1,25 @@
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { 
-  HiOutlineHome, 
-  HiOutlineLogout, 
-  HiArrowLeft,
-  HiX,
-  HiOutlineClock
+import {
+  HiOutlineHome, HiOutlineLogout, HiArrowLeft, HiX, HiChevronDown, HiChevronUp,
+  HiOutlineClock, HiOutlineDocumentReport, HiOutlineChartPie
 } from "react-icons/hi";
+import { HiOutlineBriefcase, HiOutlineGift, HiOutlineWallet } from "react-icons/hi2";
 import { useAuth } from "@/context/AuthContext";
 import { logoutUser } from "@/services/auth.service";
 import { ToastError, ToastSuccess } from "@/utils/toast";
 import { AlertConfirm } from "@/utils/alert";
 
-interface SidebarProps {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}
+interface SidebarProps { isOpen: boolean; setIsOpen: (isOpen: boolean) => void; }
 
 const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [openDropdowns, setOpenDropdowns] = useState({ donasi: false, investasi: false });
+
+  const toggleDropdown = (key: 'donasi' | 'investasi') => {
+    setOpenDropdowns(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -42,97 +43,91 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     }
   };
 
-  const navItems = [
-    { label: "Dashboard", path: "/dashboard", icon: <HiOutlineHome size={20} /> },
-    { label: "Riwayat Transaksi", path: "/riwayat-transaksi", icon: <HiOutlineClock size={20} /> },
-  ];
+  const NavItem = ({ label, path, icon }: any) => (
+    <NavLink 
+      to={path} 
+      onClick={() => setIsOpen(false)} 
+      className={({ isActive }) => 
+        `flex items-center cursor-pointer gap-3 px-4 py-3 text-sm transition-all ${
+          isActive 
+            ? "font-bold text-tertiary"
+            : "text-primary font-semibold hover:text-tertiary"
+        }`
+      }
+    >
+      {icon} {label}
+    </NavLink>
+  );
 
   return (
-    <>
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/40 z-40 md:hidden backdrop-blur-sm transition-opacity"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+    <aside className={`fixed inset-y-0 left-0 bg-customWhite w-64 z-50 flex flex-col transition-transform duration-300 md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <div className="h-20 flex items-center justify-between px-6">
+        <span className="font-bold text-2xl text-primary cursor-pointer" onClick={() => navigate("/")}>LOGO</span>
+        <button className="md:hidden" onClick={() => setIsOpen(false)}><HiX size={24} /></button>
+      </div>
 
-      <aside 
-        className={`fixed inset-y-0 left-0 bg-secondary shadow-lg w-64 z-50 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="h-20 flex items-center justify-between px-6">
-          <span 
-            className="font-extrabold text-2xl cursor-pointer text-primary tracking-wide drop-shadow-sm"
-            onClick={() => navigate("/")}
-          >
-            LOGO
-          </span>
-          <button 
-            className="md:hidden text-primary p-2 hover:bg-primary/10 rounded-xl transition-colors" 
-            onClick={() => setIsOpen(false)}
-          >
-            <HiX size={24} />
+      <div className="flex-1 py-4 px-4 space-y-1 overflow-y-auto">
+        <NavItem label="Dashboard" path="/dashboard" icon={<HiOutlineHome size={20} />} />
+        <div>
+          <button onClick={() => toggleDropdown('donasi')} className="w-full cursor-pointer flex items-center justify-between px-4 py-3 text-sm font-semibold text-primary hover:text-tertiary">
+            <span className="flex items-center gap-3"><HiOutlineGift size={20} /> Donasi</span>
+            {openDropdowns.donasi ? <HiChevronUp /> : <HiChevronDown />}
           </button>
+          {openDropdowns.donasi && <div className="pl-6"><NavItem label="Riwayat Transaksi" path="/riwayat-transaksi" icon={<HiOutlineClock size={18} />} /></div>}
         </div>
 
-        <div className="flex-1 py-2 px-4 space-y-1.5 overflow-y-auto">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.label}
-              to={item.path}
-              onClick={() => setIsOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300 ${
-                  isActive
-                    ? "bg-primary text-customWhite shadow-md"
-                    : "text-primary hover:bg-primary/10"
-                }`
-              }
-            >
-              {item.icon}
-              {item.label}
-            </NavLink>
-          ))}
-        </div>
-
-        <div className="p-4 space-y-3">
-          <button 
-            onClick={() => navigate("/")}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-sm font-semibold text-primary hover:bg-primary/10 transition-all"
-          >
-            <HiArrowLeft size={20} /> Kembali ke Beranda
+        <div>
+          <button onClick={() => toggleDropdown('investasi')} className="w-full cursor-pointer flex items-center justify-between px-4 py-3 text-sm font-semibold text-primary hover:text-tertiary">
+            <span className="flex items-center gap-3"><HiOutlineBriefcase size={20} /> Investasi</span>
+            {openDropdowns.investasi ? <HiChevronUp /> : <HiChevronDown />}
           </button>
-
-          <div 
-            onClick={() => {
-              navigate("/profile");
-              setIsOpen(false);
-            }}
-            className="bg-customWhite/40 p-3 rounded-2xl cursor-pointer hover:bg-customWhite/60 transition-all duration-300 group"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <img
-                src={user?.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.nama_pengguna || 'User')}&background=1B5E20&color=ffffff`}
-                className="w-11 h-11 rounded-full object-cover group-hover:border-primary transition-all duration-300"
-                alt="Avatar"
-              />
-              <div className="overflow-hidden">
-                <p className="font-bold text-sm text-primary truncate">{user?.nama_pengguna}</p>
-                <p className="text-xs text-primary/80 truncate">{user?.email}</p>
-              </div>
+          {openDropdowns.investasi && (
+            <div className="pl-6 space-y-1">
+              <NavItem label="Data Investasi" path="/investasi/data" icon={<HiOutlineChartPie size={18} />} />
+              <NavItem label="Verifikasi Investasi" path="/investasi/verifikasi" icon={<HiOutlineClock size={18} />} />
+              <NavItem label="Riwayat Transaksi" path="/investasi/history" icon={<HiOutlineClock size={18} />} />
             </div>
-            
-            <button 
-              onClick={handleLogout}
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold text-red-600 bg-customWhite shadow-sm hover:bg-red-50 hover:text-red-700 transition-all active:scale-95 mt-1"
-            >
-              <HiOutlineLogout size={18} /> Keluar Akun
-            </button>
-          </div>
+          )}
         </div>
-      </aside>
-    </>
+
+        <NavItem label="Saldo Keuntungan" path="/saldo" icon={<HiOutlineWallet size={20} />} />
+        <NavItem label="Laporan Keuangan" path="/laporan" icon={<HiOutlineDocumentReport size={20} />} />
+        <NavItem label="Biaya Pendapatan" path="/pendapatan" icon={<HiOutlineWallet size={20} />} />
+        <NavItem label="Biaya Pengeluaran" path="/pengeluaran" icon={<HiOutlineWallet size={20} />} />
+      </div>
+
+      <div className="p-4 space-y-3">
+        <button
+          onClick={() => navigate("/")}
+          className="flex cursor-pointer w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-primary transition-colors hover:text-tertiary"
+        >
+          <HiArrowLeft size={20} />
+          <span>Kembali ke Beranda</span>
+        </button>
+
+        <div
+          onClick={() => navigate("/profile")}
+          className="flex items-center justify-between px-4 py-3 transition-colors hover:text-tertiary cursor-pointer"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+              {user?.nama_pengguna?.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="text-xs text-primary/60">Halo,</p>
+              <p className="font-semibold text-primary hover:text-tertiary">{user?.nama_pengguna}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="rounded-xl cursor-pointer p-2 text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+            title="Logout"
+          >
+            <HiOutlineLogout size={20} />
+          </button>
+        </div>
+      </div>
+    </aside>
   );
 };
 
