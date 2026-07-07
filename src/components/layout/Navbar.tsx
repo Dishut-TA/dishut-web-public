@@ -5,7 +5,6 @@ import {
   HiChevronDown,
   HiOutlineUser,
   HiOutlinePresentationChartBar,
-  HiOutlineClock,
   HiOutlineLogout,
   HiMenu,
   HiX,
@@ -158,16 +157,6 @@ const Navbar = () => {
                     />{" "}
                     Dashboard
                   </div>
-                  <div
-                    className="p-2.5 flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded-xl text-primary text-sm font-medium transition-colors"
-                    onClick={() => {
-                      navigate("/riwayat-transaksi");
-                      setIsDropdownOpen(false);
-                    }}
-                  >
-                    <HiOutlineClock size={18} className="text-primary" />{" "}
-                    Riwayat Transaksi
-                  </div>
                   <hr className="my-1 border-gray-100" />
                   <div
                     className="p-2.5 flex items-center gap-3 cursor-pointer hover:bg-red-50 rounded-xl text-red-600 text-sm font-semibold transition-colors"
@@ -268,15 +257,6 @@ const Navbar = () => {
                   variant="outline"
                   onClick={() => {
                     navigate("/dashboard");
-                    setOpen(false);
-                  }}
-                  className="w-full text-sm"
-                />
-                <Button
-                  label="Riwayat Transaksi"
-                  variant="outline"
-                  onClick={() => {
-                    navigate("/riwayat-transaksi");
                     setOpen(false);
                   }}
                   className="w-full text-sm"

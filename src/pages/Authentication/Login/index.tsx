@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FcGoogle } from "react-icons/fc";
 import InputField from '@/components/InputField';
 import PasswordField from '@/components/PasswordField';
@@ -12,26 +12,33 @@ import { useAuth } from '@/context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setUser } = useAuth();
-  const [form, setForm] = useState<LoginFormData>({ 
-    email: '', 
-    password: '' 
+  const [form, setForm] = useState<LoginFormData>({
+    email: '',
+    password: ''
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    
+
     if (errors[e.target.name as keyof FormErrors]) {
       setErrors({ ...errors, [e.target.name]: '' });
     }
   };
 
+  useEffect(() => {
+    if (location.state?.message) {
+      ToastError(location.state.message);
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
+
     if (!form.email || !form.password) {
       setErrors({ message: 'Email dan kata sandi wajib diisi' });
       ToastError('Mohon isi email dan kata sandi');
@@ -42,20 +49,14 @@ const Login = () => {
 
     try {
       const response = await loginUser(form.email, form.password);
-      
-      // 1. Simpan ke LocalStorage
       localStorage.setItem('token', response.payload.token);
       localStorage.setItem('user', JSON.stringify(response.payload.user));
-      
-      // 2. Update Global State Context (Penting agar Navbar mendeteksi perubahan seketika)
+
       setUser(response.payload.user);
-      
-      // 3. Tampilkan Pesan Sukses
+
       ToastSuccess('Login Berhasil! Selamat datang.');
-      
-      // 4. Redirect
       setTimeout(() => navigate('/'), 800);
-      
+
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Email atau Kata Sandi Salah';
       ToastError(errorMessage);
@@ -65,9 +66,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row pt-20 md:pt-0"> 
-      {/* Catatan: pt-20 ditambahkan agar form login tidak tertutup oleh navbar yang posisinya absolute */}
-      
+    <div className="flex min-h-screen flex-col md:flex-row pt-20 md:pt-0">
       <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
         <form
           className="w-full max-w-md p-6 md:p-8 rounded-2xl"
@@ -110,8 +109,8 @@ const Login = () => {
             type="submit"
             disabled={isLoading}
             className={`w-full text-white font-semibold transition-all p-4 rounded-full mt-6 
-              ${isLoading 
-                ? 'bg-gray-400 cursor-not-allowed' 
+              ${isLoading
+                ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-primary hover:bg-tertiary cursor-pointer shadow-md hover:shadow-lg'
               }`}
           >
