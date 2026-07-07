@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 const CTASection: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <section className="w-full bg-[#F8F9FA] py-16 md:py-24 px-5 md:px-8 lg:px-12">
-      <div className="max-w-6xl mx-auto">
+    <section className="w-full bg-customWhite py-16 md:py-24 px-5 md:px-8 lg:px-12">
+      <div className="mx-auto">
         <div className="bg-primary rounded-4xl py-12 px-6 md:py-16 md:px-12 flex flex-col items-center text-center shadow-xl relative overflow-hidden">
           <img
             src={PlantCoinIcon}

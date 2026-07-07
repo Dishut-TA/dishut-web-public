@@ -67,7 +67,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-customWhite/90 backdrop-blur-md shadow-sm transition-all duration-300">
+    <nav className="fixed top-0 left-0 w-full z-5000 bg-customWhite/90 backdrop-blur-md transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
         <div
           className="font-bold text-xl cursor-pointer text-primary transform hover:scale-105 active:scale-95 transition-all duration-200"

@@ -1,29 +1,29 @@
-import ProgramCard from "@/components/ProgramCard";
+// import ProgramCard from "@/components/ProgramCard";
 
-const DATA = [
-  {
-    id: 1,
-    title: "Rehabilitasi Hutan DAS Cimanuk",
-    location: "Garut, Jawa Barat",
-    description:
-      "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-    collected: 130000000,
-    target: 200000000,
-  },
-  {
-    id: 2,
-    title: "Rehabilitasi Hutan DAS Cimanuk",
-    location: "Garut, Jawa Barat",
-    description:
-      "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-    collected: 130000000,
-    target: 200000000,
-  },
-];
+// const DATA = [
+//   {
+//     id: 1,
+//     title: "Rehabilitasi Hutan DAS Cimanuk",
+//     location: "Garut, Jawa Barat",
+//     description:
+//       "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
+//     image:
+//       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+//     collected: 130000000,
+//     target: 200000000,
+//   },
+//   {
+//     id: 2,
+//     title: "Rehabilitasi Hutan DAS Cimanuk",
+//     location: "Garut, Jawa Barat",
+//     description:
+//       "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
+//     image:
+//       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+//     collected: 130000000,
+//     target: 200000000,
+//   },
+// ];
 
 const ProgramKonservasiSection = () => {
   return (
@@ -41,11 +41,11 @@ const ProgramKonservasiSection = () => {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {DATA.map((item) => (
             <ProgramCard key={item.id} {...item} />
           ))}
-        </div>
+        </div> */}
 
       </div>
     </section>
