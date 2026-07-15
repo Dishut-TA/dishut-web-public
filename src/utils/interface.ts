@@ -26,14 +26,19 @@ export interface RegisterPayload {
   kata_sandi: string;
 }
 
-export interface TransactionData {
+export interface TransactionDonasiData {
   id: string;
-  activityName: string;
-  date: string;
-  status: 'Menunggu Konfirmasi' | 'Diverifikasi' | 'Dibatalkan' | 'Sudah Dibayar';
+  tanggal: string;
+  lahanProgram: string;
+  jenisBibit: string;
+  jumlah: number;
   amount: number;
-  userName?: string;
-  userPhone?: string;
-  userEmail?: string;
-  paymentMethod?: string;
+  userName: string;
+  userPhone: string;
+  userEmail: string;
+  paymentMethod: string;
+  status: 'Menunggu Verifikasi' | 'Terkumpul' | 'Disalurkan' | 'Terealisasi';
+  lat?: string;
+  long?: string;
+  fotoRealisasi?: string;
 }

@@ -33,12 +33,12 @@ const NotFound = () => {
 
         <div className="group">
           <Button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate(-1)}
             size="lg"
             className="flex items-center gap-2 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
           >
             <HiArrowLeft className="group-hover:-translate-x-1 transition-transform duration-300" size={20} />
-            Kembali ke Beranda
+            Kembali
           </Button>
         </div>
 

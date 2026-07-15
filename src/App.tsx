@@ -23,8 +23,8 @@ import NotFound from './pages/NotFound';
 
 import Dashboard from './pages/UserDashboard/Dashboard'; 
 import Profile from './pages/UserDashboard/Profile';
-import TransactionHistoryDonasi from './pages/UserDashboard/Donation/TransactionHistoryDonasi';
-import TransactionDonasiDetail from './pages/UserDashboard/Donation/TransactionDonasiDetail';
+import TransactionHistoryDonasi from './pages/UserDashboard/Donation/TransactionHistory/TransactionHistoryDonasi';
+import TransactionDonasiDetail from './pages/UserDashboard/Donation/TransactionHistory/TransactionDonasiDetail';
 import TransactionHistoryInvestasi from './pages/UserDashboard/Investation/RiwayatTransaksiInvestasi/TransactionHistoryInvestasi';
 import TransactionInvestasiDetail from './pages/UserDashboard/TransactionHistory/sections/TransactionInvestasiDetail';
 import VerifikasiInvestasi from './pages/UserDashboard/Investation/VerifikasiInvestasi';
@@ -37,6 +37,7 @@ import RiwayatTransaksi from './pages/UserDashboard/SaldoKeuntungan/RiwayatTrans
 import LaporanKeuangan from './pages/UserDashboard/Investation/LaporanInvestasi/LaporanKeuangan';
 import BiayaPendapatan from './pages/UserDashboard/Investation/LaporanInvestasi/BiayaPendapatan';
 import BiayaPengeluaran from './pages/UserDashboard/Investation/LaporanInvestasi/BiayaPengeluaran';
+import DashboardDonation from './pages/UserDashboard/Donation/DashboardDonation/DashboardDonation';
 
 function App() {
   return (
@@ -68,6 +69,7 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/donasi/dashboard" element={<DashboardDonation />} />
             <Route path="/donasi/riwayat-transaksi" element={<TransactionHistoryDonasi />} />
             <Route path="/donasi/riwayat-transaksi/:id" element={<TransactionDonasiDetail />} />
             <Route path="/investasi/data" element={<DataInvestasi />} />

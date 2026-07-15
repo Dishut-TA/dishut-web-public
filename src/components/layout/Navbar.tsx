@@ -18,7 +18,7 @@ import { AlertConfirm } from "@/utils/alert";
 const menus = [
   { label: "Beranda", path: "/" },
   { label: "Pemetaan", path: "/pemetaan" },
-  { label: "Monitoring", path: "/monitoring" },
+  // { label: "Monitoring", path: "/monitoring" },
   { label: "Donasi", path: "/donasi" },
   { label: "Investasi", path: "/investasi" },
 ];

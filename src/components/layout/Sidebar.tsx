@@ -4,7 +4,7 @@ import {
   HiOutlineHome, HiOutlineLogout, HiArrowLeft, HiX, HiChevronDown,
   HiOutlineClock, HiOutlineDocumentReport, HiOutlineChartPie
 } from "react-icons/hi";
-import { HiOutlineBriefcase, HiOutlineGift, HiOutlineWallet } from "react-icons/hi2";
+import { HiOutlineBriefcase, HiOutlineGift, HiOutlineShieldCheck, HiOutlineWallet } from "react-icons/hi2";
 import { useAuth } from "@/context/AuthContext";
 import { logoutUser } from "@/services/auth.service";
 import { ToastError, ToastSuccess } from "@/utils/toast";
@@ -103,6 +103,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             
             <div className={`grid transition-all duration-300 ease-in-out ${openDropdowns.donasi ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"}`}>
               <div className="overflow-hidden pl-6">
+                <NavItem label="Dashboard Donasi" path="/donasi/dashboard" icon={<HiOutlineHome size={18} />} />
                 <NavItem label="Riwayat Transaksi" path="/donasi/riwayat-transaksi" icon={<HiOutlineClock size={18} />} />
               </div>
             </div>
@@ -120,7 +121,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             <div className={`grid transition-all duration-300 ease-in-out ${openDropdowns.investasi ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"}`}>
               <div className="overflow-hidden pl-6 space-y-1">
                 <NavItem label="Data Investasi" path="/investasi/data" icon={<HiOutlineChartPie size={18} />} />
-                <NavItem label="Verifikasi Investasi" path="/investasi/verifikasi" icon={<HiOutlineClock size={18} />} />
+                <NavItem label="Verifikasi Investasi" path="/investasi/verifikasi" icon={<HiOutlineShieldCheck size={18} />} />
                 <NavItem label="Riwayat Transaksi" path="/investasi/riwayat-transaksi" icon={<HiOutlineClock size={18} />} />
               </div>
             </div>
