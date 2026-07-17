@@ -18,10 +18,7 @@ const HeroDonasiSection = ({ backgroundImage }: HeroDonasiSectionProps) => {
         backgroundPosition: "center",
       }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/30" />
-
-      {/* Content */}
+      <div className="absolute inset-0 bg-black/65 backdrop-blur-md" />
       <div className="relative z-10 max-w-3xl px-4 text-customWhite">
         <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-relaxed mb-4">
           “Setiap pohon yang kita tanam hari ini adalah harapan bagi bumi di masa depan”

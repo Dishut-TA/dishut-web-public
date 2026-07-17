@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; 
+import { useAuth } from "@/context/AuthContext"; 
 import { FiChevronLeft, FiChevronRight, FiShare2 } from "react-icons/fi";
 import { HiOutlineUserGroup, HiOutlineCalendar, HiOutlineChartPie } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
 import { AnimatePresence, motion, type Transition } from "framer-motion";
-import { ToastSuccess } from "@/utils/toast";
+import { ToastSuccess, ToastError } from "@/utils/toast"; 
 import StepperIndicator from "../components/stepper/StepperIndicator";
 import Step1Identity from "../components/stepper/Step1Identity";
 import Step2Investment from "../components/stepper/Step2Investment";
@@ -17,6 +19,9 @@ import AgreementWarningModal from "../components/AgreementWarningModal";
 const cardTransition: Transition = { duration: 0.6, ease: [0.22, 1, 0.36, 1] };
 
 const InvestmentDetail: React.FC = () => {
+  const { user } = useAuth(); 
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isFlipped, setIsFlipped] = useState(false);
   const [step, setStep] = useState(1);
   const [hasDownloaded, setHasDownloaded] = useState(false);
@@ -24,6 +29,12 @@ const InvestmentDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'detail' | 'panduan' | 'dokumen'>('detail');
 
   const handleInvestClick = () => {
+    if (!user) {
+      ToastError("Anda harus login terlebih dahulu untuk melakukan investasi.");
+      navigate('/login', { state: { from: location } });
+      return; 
+    }
+
     if (!hasDownloaded) {
       setIsModalOpen(true);
     } else {
@@ -46,7 +57,7 @@ const InvestmentDetail: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <button 
           onClick={isFlipped ? handleCancel : undefined}
-          className="flex items-center gap-1 text-[#2E7D32] font-semibold text-sm hover:underline mb-6 md:mb-8 transition-all"
+          className="flex items-center gap-1 text-[#2E7D32] font-semibold text-sm hover:underline mb-6 md:mb-8 transition-all cursor-pointer"
         >
           <FiChevronLeft className="text-lg" /> {isFlipped ? "Batal Investasi" : "Kembali"}
         </button>
@@ -154,7 +165,7 @@ const InvestmentDetail: React.FC = () => {
 
                     <button 
                       onClick={handleInvestClick}
-                      className="w-full py-3.5 sm:py-4 bg-primary text-white rounded-full text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:bg-[#144a18] transition-all shadow-md active:scale-[0.98]"
+                      className="w-full py-3.5 sm:py-4 bg-primary text-white rounded-full text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:bg-[#144a18] transition-all shadow-md active:scale-[0.98] cursor-pointer"
                     >
                       Investasi Sekarang <FiChevronRight className="text-xl" />
                     </button>
