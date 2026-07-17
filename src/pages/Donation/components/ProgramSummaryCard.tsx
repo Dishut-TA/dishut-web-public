@@ -4,8 +4,9 @@ import Button from "@/components/Button";
 import { MdLocationOn } from "react-icons/md";
 import { PiLeafFill } from "react-icons/pi";
 import DonationStepper, { type DonationFormData } from "./stepper/DonationStepper";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ToastError, ToastSuccess } from "@/utils/toast";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProgramSummaryCardProps {
   title: string;
@@ -31,17 +32,18 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
   target,
   status,
 }) => {
+  const { user } = useAuth(); 
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const locations = useLocation();  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<DonationFormData>({
     name: "",
     amount: "0",
-    selectedBibits: [], // Diperbarui untuk mendukung multi-bibit
+    selectedBibits: [], 
     paymentMethod: "",
     virtualAccount: "",
-    proofFile: null, // Diperbarui untuk file bukti transfer
+    proofFile: null, 
   });
 
   const progress = useMemo(
@@ -57,6 +59,10 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
   };
 
   const handleOpenDonation = () => {
+    if(!user) {
+      ToastError('Anda harus login terlebih dahulu untuk melakukan donasi.');
+      navigate('/login', { state: {from: locations} })
+    }
     setCurrentStep(1);
     setIsFlipped(true);
   };

@@ -100,7 +100,7 @@ const MapCard = ({
 
       {!showNavigateButton && type === "kekritisan" && (
         <>
-          <div className="absolute top-4 left-4 z-1000 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-sm text-xs border border-gray-100">
+          <div className="absolute top-4 left-14 bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-sm text-xs border border-gray-100">
             <p className="font-bold text-primary mb-2">Keterangan</p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
