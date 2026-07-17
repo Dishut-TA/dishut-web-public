@@ -42,3 +42,15 @@ export interface TransactionDonasiData {
   long?: string;
   fotoRealisasi?: string;
 }
+
+export interface TransactionData {
+  id: string;
+  date: string;
+  userName: string;
+  status: string;
+  activityName: string;
+  amount: number;
+  paymentMethod?: string;
+  userPhone: string;
+  userEmail: string;
+}
