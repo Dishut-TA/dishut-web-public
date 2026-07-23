@@ -1,11 +1,10 @@
 import React from "react";
 
-// Update interface untuk mendukung struktur data yang baru
 export interface AllocationItem {
   id: number;
   label: string;
   percentage: number;
-  amount?: number; // Optional, karena bisa jadi text seperti "Ditanggung Pemerintah"
+  amount?: number; 
   customValueText?: string;
   isStrikethrough?: boolean;
 }
@@ -30,13 +29,10 @@ const AllocationTable: React.FC<AllocationTableProps> = ({
 }) => {
   return (
     <div className="">
-        {/* Title */}
         <h3 className="mb-4 text-xl font-semibold text-primary md:text-2xl">
           {title}
         </h3>
       <div className="rounded-xl bg-[#F8F9FA] p-5 md:p-6 border border-gray-100">
-
-        {/* Total Terkumpul Header */}
         <div className="flex items-center justify-between mb-6">
           <span className="text-primary font-medium text-[15px] md:text-base">
             Total Donasi Terkumpul:
@@ -46,7 +42,6 @@ const AllocationTable: React.FC<AllocationTableProps> = ({
           </span>
         </div>
 
-        {/* List Items */}
         <div className="space-y-4">
           {items.map((item, index) => (
             <div

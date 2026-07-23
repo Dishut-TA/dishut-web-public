@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Button from "@/components/Button";
 import { MdLocationOn } from "react-icons/md";
@@ -13,7 +13,7 @@ interface ProgramSummaryCardProps {
   location: string;
   image: string;
   collected: number;
-  target: number;
+  // HAPUS properti target disini
   status: "Aktif" | "Non-Aktif";
 }
 
@@ -29,12 +29,12 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
   location,
   image,
   collected,
-  target,
   status,
 }) => {
   const { user } = useAuth(); 
   const navigate = useNavigate();
-  const locations = useLocation();  const [isSubmitting, setIsSubmitting] = useState(false);
+  const locations = useLocation();  
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<DonationFormData>({
@@ -46,10 +46,7 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
     proofFile: null, 
   });
 
-  const progress = useMemo(
-    () => Math.min((collected / target) * 100, 100),
-    [collected, target]
-  );
+  // HAPUS fungsi progress useMemo disini
 
   const handleChange = (field: keyof DonationFormData, value: any) => {
     setFormData((prev) => ({
@@ -88,19 +85,6 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
       setCurrentStep((prev) => prev - 1);
     }
   };
-
-  // const handleCheckStatus = () => {
-  //   console.log("Submit Donasi:", {
-  //     name: formData.name,
-  //     amount: formData.amount,
-  //     bibit: formData.selectedBibits,
-  //     paymentMethod: formData.paymentMethod,
-  //     virtualAccount: formData.virtualAccount,
-  //     proofFile: formData.proofFile?.name,
-  //   });
-  //   alert("Donasi berhasil dikirim!");
-  //   // setIsFlipped(false); // Bisa di un-comment jika ingin menutup form setelah sukses
-  // };
 
   const handleSubmitDonasi = async () => {
     if (!formData.proofFile) {
@@ -167,21 +151,13 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
                     <span className="text-xl font-semibold md:text-2xl">
                       {formatNumber(collected)}
                     </span>
-                    <span className="font-semibold text-primary/80 mt-1">Bibit</span>
+                    <span className="font-semibold text-primary/80 mt-1">Bibit Terkumpul</span>
                   </div>
-                  <span className="font-bold">{Math.round(progress)}%</span>
+                  {/* HAPUS TULISAN PRESENTASE PROGRESS DISINI */}
                 </div>
 
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
-                  <div
-                    className="h-full rounded-full bg-primary transition-all duration-500"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-
-                <p className="mt-2 text-xs font-semibold text-primary/70">
-                  dari target {formatNumber(target)} Bibit
-                </p>
+                {/* HAPUS UI PROGRESS BAR DAN TULISAN TARGET DISINI */}
+                
               </div>
 
               <Button

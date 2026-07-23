@@ -102,7 +102,6 @@ const DonasiDetail: React.FC = () => {
             location={donationDetail.location}
             image={donationDetail.image}
             collected={donationDetail.collectedBibit}
-            target={donationDetail.targetBibit} 
             status={donationDetail.status as "Aktif" | "Non-Aktif"}
             />
           </aside>

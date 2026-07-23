@@ -52,6 +52,16 @@ const DonationIdentityStep: React.FC<DonationIdentityStepProps> = ({
             onChange={(e) => onChange("name", e.target.value)}
             className={inputClassName}
           />
+          <label className="mb-2 mt-4 block text-sm font-medium text-primary">
+            Alamat
+          </label>
+          <input
+            type="text"
+            placeholder="Input Alamat"
+            value={name === "Orang Baik" ? "" : name}
+            onChange={(e) => onChange("name", e.target.value)}
+            className={inputClassName}
+          />
         </div>
       )}
     </div>

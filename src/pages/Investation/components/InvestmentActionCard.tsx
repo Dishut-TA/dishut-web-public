@@ -8,7 +8,7 @@ import Step1Identity from "./stepper/Step1Identity";
 import Step2Investment from "./stepper/Step2Investment";
 import Step3Payment from "./stepper/Step3Payment";
 import Step4Success from "./stepper/Step4Success";
-import { ToastSuccess } from '@/utils/toast'; // Pastikan import toast ada jika ingin dipakai di tombol luar
+import { ToastSuccess } from '@/utils/toast'; 
 
 const cardTransition: Transition = { duration: 0.7, ease: [0.22, 1, 0.36, 1] };
 
@@ -17,11 +17,9 @@ export const InvestmentActionCard: React.FC<{ image: string }> = ({ image }) => 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(1);
 
-  // Fungsi untuk menangani unduhan dokumen
   const handleDownloadAgreement = () => {
     // Tambahkan logika unduh file PDF di sini nantinya
     // contoh: window.open('/template-perjanjian.pdf', '_blank');
-    
     // Jika tombol dari luar (bukan modal) ditekan, tampilkan toast juga
     if (!isModalOpen) {
         ToastSuccess("Template Surat Perjanjian berhasil diunduh!");
@@ -36,7 +34,6 @@ export const InvestmentActionCard: React.FC<{ image: string }> = ({ image }) => 
             <motion.div key="front" exit={{ rotateY: 90, opacity: 0 }} className="w-full">
               <img src={image} alt="Cover" className="w-full h-72 object-cover rounded-2xl mb-6 shadow-sm" />
               
-              {/* Tambahkan onClick ke tombol Unduh Perjanjian di depan card */}
               <button 
                 onClick={handleDownloadAgreement} 
                 className="w-full py-3.5 border-2 border-primary text-primary rounded-full font-semibold flex items-center justify-center gap-2 mb-4 hover:bg-primary/5 transition-colors"
@@ -62,7 +59,6 @@ export const InvestmentActionCard: React.FC<{ image: string }> = ({ image }) => 
         </AnimatePresence>
       </motion.div>
 
-      {/* Tambahkan prop onTriggerDownload di sini */}
       <AgreementWarningModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 

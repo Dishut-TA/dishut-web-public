@@ -6,6 +6,7 @@ import { AlertConfirm } from '@/utils/alert'; // Tambahan Import Alert
 import { FiCalendar, FiEye, FiEyeOff } from 'react-icons/fi';
 import ProfileImagePicker from './components/ProfileImagePicker';
 import ProfileInput from './components/ProfileInput';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const Profile = () => {
   const { user, setUser } = useAuth();
@@ -108,9 +109,7 @@ const Profile = () => {
 
   if (isFetching) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
+      <LoadingScreen />
     );
   }
 

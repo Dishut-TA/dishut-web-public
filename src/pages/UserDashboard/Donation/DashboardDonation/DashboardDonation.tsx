@@ -3,7 +3,6 @@ import { useAuth } from '@/context/AuthContext';
 import { 
   HiOutlineInbox, 
   HiOutlineArrowPath, 
-  HiOutlineMap 
 } from 'react-icons/hi2';
 import StatCard from './components/StatCard';
 import RecentStatus from './components/RecentStatus';
@@ -25,7 +24,7 @@ const DashboardDonation: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           <StatCard 
             title="Total Bibit Didonasikan" 
             value="2 Pohon" 
@@ -40,11 +39,6 @@ const DashboardDonation: React.FC = () => {
             title="Sedang Diproses" 
             value="2 Pohon" 
             icon={<HiOutlineArrowPath size={24} />} 
-          />
-          <StatCard 
-            title="Target Penghijauan" 
-            value="40 Hektar" 
-            icon={<HiOutlineMap size={24} />} 
           />
         </div>
 
