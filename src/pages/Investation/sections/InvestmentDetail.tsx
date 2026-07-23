@@ -176,8 +176,7 @@ const InvestmentDetail: React.FC = () => {
                     initial={{ rotateY: 90, opacity: 0 }} 
                     animate={{ rotateY: 0, opacity: 1 }} 
                     transition={cardTransition}
-                    className="w-full bg-[#D5ECD8] rounded-3xl p-5 sm:p-6 md:p-8 origin-center shadow-md overflow-hidden"
-                  >
+className="w-full bg-[#D5ECD8] rounded-3xl p-5 sm:p-6 md:p-8 origin-center shadow-md overflow-visible relative z-20"                  >
                     {step <= 3 && <StepperIndicator currentStep={step} />}
                     <div className="mt-2 md:mt-4">
                       {step === 1 && <Step1Identity onNext={() => setStep(2)} />}
