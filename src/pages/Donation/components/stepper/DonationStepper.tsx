@@ -8,6 +8,7 @@ import DonationPaymentStep from "./DonationPaymentStep";
 export interface SelectedBibit {
   id: string;
   label: string;
+  tinggi: string;
   price: number;
   quantity: number;
 }

@@ -46,8 +46,6 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
     proofFile: null, 
   });
 
-  // HAPUS fungsi progress useMemo disini
-
   const handleChange = (field: keyof DonationFormData, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -153,11 +151,8 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
                     </span>
                     <span className="font-semibold text-primary/80 mt-1">Bibit Terkumpul</span>
                   </div>
-                  {/* HAPUS TULISAN PRESENTASE PROGRESS DISINI */}
                 </div>
 
-                {/* HAPUS UI PROGRESS BAR DAN TULISAN TARGET DISINI */}
-                
               </div>
 
               <Button

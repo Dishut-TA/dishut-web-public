@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronDown, FiMinus, FiPlus } from "react-icons/fi";
 import { type DonationFormData, type SelectedBibit } from "./DonationStepper";
+import { ToastError } from "@/utils/toast";
 
 interface DonationAmountStepProps {
   selectedBibits: SelectedBibit[];
@@ -15,10 +16,11 @@ interface PaymentOption {
 }
 
 interface BibitOption {
-  id: string;
+  id: string; 
   label: string;
+  tinggi: string; 
   price: number;
-  stock: number; // TAMBAHKAN TIPE STOK
+  stock: number;
 }
 
 const paymentOptions: PaymentOption[] = [
@@ -28,11 +30,11 @@ const paymentOptions: PaymentOption[] = [
   { id: "mandiri", label: "Bank Mandiri", code: "MDR" },
 ];
 
-// TAMBAHKAN DATA MOCK STOK BIBIT (Real-Time Ketersediaan)
 const bibitOptions: BibitOption[] = [
-  { id: "mahoni", label: "Mahoni", price: 15000, stock: 150 },
-  { id: "sengon", label: "Sengon", price: 10000, stock: 300 },
-  { id: "mangrove", label: "Mangrove", price: 20000, stock: 50 },
+  { id: "spec-001", label: "Mahoni", tinggi: "30–60 cm", price: 15000, stock: 150 },
+  { id: "spec-002", label: "Sengon", tinggi: "61–100 cm", price: 10000, stock: 300 },
+  { id: "spec-003", label: "Mangrove", tinggi: "> 100 cm", price: 20000, stock: 50 },
+  { id: "spec-004", label: "Alpukat", tinggi: "70–100 cm", price: 25000, stock: 100 },
 ];
 
 const formatRupiah = (num: number) =>
@@ -81,37 +83,46 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
     [paymentMethod]
   );
 
-  // Fungsi Tambah Kurang (Button)
   const handleQuantityChange = (bibitId: string, delta: number, maxStock: number) => {
     let newSelected = [...selectedBibits];
     const existingIndex = newSelected.findIndex((b) => b.id === bibitId);
+    
+    let currentQty = existingIndex >= 0 ? newSelected[existingIndex].quantity : 0;
+    let newQuantity = currentQty + delta;
+
+    if (newQuantity > maxStock) {
+      if (currentQty !== maxStock) {
+        ToastError(`Stok maksimal untuk bibit ini hanya ${maxStock} batang.`);
+      }
+      newQuantity = maxStock;
+    } else if (newQuantity < 0) {
+      newQuantity = 0;
+    }
 
     if (existingIndex >= 0) {
-      // Batasi agar tidak melebihi stock maksimal
-      const newQuantity = Math.max(0, Math.min(newSelected[existingIndex].quantity + delta, maxStock));
       if (newQuantity === 0) {
         newSelected.splice(existingIndex, 1);
       } else {
         newSelected[existingIndex].quantity = newQuantity;
       }
-    } else if (delta > 0) {
+    } else if (newQuantity > 0) {
       const option = bibitOptions.find((b) => b.id === bibitId);
       if (option) {
-        newSelected.push({ ...option, quantity: Math.min(delta, maxStock) });
+        newSelected.push({ ...option, quantity: newQuantity });
       }
     }
 
     onChange("selectedBibits", newSelected);
   };
 
-  // Fungsi Ketik Manual (Input)
   const handleManualInput = (bibitId: string, value: string, maxStock: number) => {
-    // Hanya ambil angka
     let numValue = parseInt(value.replace(/[^0-9]/g, ""), 10);
     if (isNaN(numValue)) numValue = 0;
     
-    // Batasi input agar tidak lebih dari stok
-    if (numValue > maxStock) numValue = maxStock;
+    if (numValue > maxStock) {
+      ToastError(`Stok maksimal untuk bibit ini hanya ${maxStock} batang.`);
+      numValue = maxStock;
+    }
 
     let newSelected = [...selectedBibits];
     const existingIndex = newSelected.findIndex((b) => b.id === bibitId);
@@ -148,8 +159,10 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
                 className="flex items-center justify-between rounded-2xl border border-[#98C98A] bg-transparent p-4 transition-all duration-300 hover:shadow-sm"
               >
                 <div>
-                  <h4 className="text-sm font-semibold text-primary">{bibit.label}</h4>
-                  <p className="text-sm text-primary/70">
+                  <h4 className="text-sm font-semibold text-primary">
+                    {bibit.label} <span className="font-normal text-primary/70">({bibit.tinggi})</span>
+                  </h4>
+                  <p className="text-sm text-primary/70 mt-0.5">
                     {formatRupiah(bibit.price)} <span className="text-xs ml-1 text-primary/50">| Stok: {bibit.stock}</span>
                   </p>
                 </div>
@@ -164,7 +177,6 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
                     <FiMinus size={14} />
                   </button>
                   
-                  {/* UBAH KE INPUT FIELD AGAR BISA DIKETIK */}
                   <input
                     type="text"
                     value={quantity === 0 ? "" : quantity}
@@ -177,7 +189,7 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
                     type="button"
                     onClick={() => handleQuantityChange(bibit.id, 1, bibit.stock)}
                     className="flex h-7 w-7 items-center justify-center rounded-full text-primary transition-colors hover:bg-gray-100 disabled:opacity-30 active:scale-95"
-                    disabled={quantity >= bibit.stock} // Disable button if reaches max stock
+                    disabled={quantity >= bibit.stock}
                   >
                     <FiPlus size={14} />
                   </button>
@@ -257,7 +269,7 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
           {selectedBibits.length > 0 ? (
              selectedBibits.map((item) => (
                 <div key={item.id} className="flex justify-between items-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <span>{item.quantity}x Bibit {item.label}</span>
+                  <span>{item.quantity}x Bibit {item.label} ({item.tinggi})</span>
                   <span>{formatRupiah(item.price * item.quantity)}</span>
                 </div>
              ))
@@ -268,11 +280,6 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
           <div className="flex justify-between items-center pt-2">
             <span>Total Bibit</span>
             <span>{totalJumlahBibit} Bibit</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span>Biaya Operasional (0%)</span>
-            <span>Rp 0</span>
           </div>
         </div>
 
