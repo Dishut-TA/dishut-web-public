@@ -14,24 +14,19 @@ const TabDokumen: React.FC<TabDokumenProps> = ({ onDownloadTemplate }) => {
       
       <div className="space-y-2 font-medium">
         <div className={docStyle}>
+          <span className="w-48 shrink-0">Dokumen Perjanjian Investasi</span>
+          <span>:</span>
+          <a className={linkStyle}>DokumenPerjanjianInvestasi.pdf</a>
+        </div>
+        <div className={docStyle}>
           <span className="w-48 shrink-0">Dokumen Rencana Bisnis</span>
           <span>:</span>
-          <a className={linkStyle}>RencanaProyekPembangunanEkowisata.pdf</a>
-        </div>
-        <div className={docStyle}>
-          <span className="w-48 shrink-0">Dokumen Proyek Keuangan</span>
-          <span>:</span>
-          <a className={linkStyle}>ProyekKeuanganWisataDiving.pdf</a>
-        </div>
-        <div className={docStyle}>
-          <span className="w-48 shrink-0">Dokumen Hukum dan Perizinan</span>
-          <span>:</span>
-          <a className={linkStyle}>HukumDanPerizinanInvestasi.pdf</a>
+          <a className={linkStyle}>DokumenRencanaBisnis.pdf</a>
         </div>
         <div className={docStyle}>
           <span className="w-48 shrink-0">Template Perjanjian Investor</span>
           <span>:</span>
-          <span onClick={onDownloadTemplate} className={linkStyle}>DokumenPerjanjian.pdf</span>
+          <span onClick={onDownloadTemplate} className={linkStyle}>DokumenPerjanjianInvestor.pdf</span>
         </div>
       </div>
 

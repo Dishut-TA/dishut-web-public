@@ -38,6 +38,9 @@ import LaporanKeuangan from './pages/UserDashboard/Investation/LaporanInvestasi/
 import BiayaPendapatan from './pages/UserDashboard/Investation/LaporanInvestasi/BiayaPendapatan';
 import BiayaPengeluaran from './pages/UserDashboard/Investation/LaporanInvestasi/BiayaPengeluaran';
 import DashboardDonation from './pages/UserDashboard/Donation/DashboardDonation/DashboardDonation';
+import LaporanProyek from './pages/UserDashboard/Investation/LaporanInvestasi/LaporanProyek';
+import DetailLaporanProyek from './pages/UserDashboard/Investation/LaporanInvestasi/LaporanProyek/DetailLaporanProyek';
+import DetailLaporanKeuangan from './pages/UserDashboard/Investation/LaporanInvestasi/LaporanKeuangan/DetailLaporanKeuangan';
 
 function App() {
   return (
@@ -82,6 +85,9 @@ function App() {
             <Route path="/saldo/tarik-saldo" element={<TarikSaldo />} />
             <Route path="/saldo/riwayat-transaksi" element={<RiwayatTransaksi />} />
             <Route path="/laporan-investasi/keuangan" element={<LaporanKeuangan />} />
+            <Route path="/laporan-investasi/keuangan/:id" element={<DetailLaporanKeuangan />} />
+            <Route path="/laporan-investasi/proyek" element={<LaporanProyek />} />
+            <Route path="/laporan-investasi/proyek/:id" element={<DetailLaporanProyek />} />
             <Route path="/laporan-investasi/pendapatan" element={<BiayaPendapatan />} />
             <Route path="/laporan-investasi/pengeluaran" element={<BiayaPengeluaran />} />
           </Route>

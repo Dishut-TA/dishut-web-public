@@ -128,6 +128,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           </div>
 
           <NavItem label="Saldo Keuntungan" path="/saldo" icon={<HiOutlineWallet size={20} />} />
+          <NavItem label="Laporan Proyek" path="/laporan-investasi/proyek" icon={<HiOutlineDocumentReport size={20} />} />
           <NavItem label="Laporan Keuangan" path="/laporan-investasi/keuangan" icon={<HiOutlineDocumentReport size={20} />} />
           <NavItem label="Biaya Pendapatan" path="/laporan-investasi/pendapatan" icon={<HiOutlineWallet size={20} />} />
           <NavItem label="Biaya Pengeluaran" path="/laporan-investasi/pengeluaran" icon={<HiOutlineWallet size={20} />} />
