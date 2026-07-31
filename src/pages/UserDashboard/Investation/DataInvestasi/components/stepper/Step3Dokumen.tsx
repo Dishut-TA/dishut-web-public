@@ -7,8 +7,6 @@ interface Step3Props {
 const documents = [
   { label: 'Dokumen Perjanjian Investasi', file: 'PerjanjianInvestasi.pdf' },
   { label: 'Dokumen Rencana Bisnis', file: 'RencanaProyekPembangunanWisataDiving.pdf' },
-  { label: 'Dokumen Proyek Keuangan', file: 'ProyekKeuanganWisataDiving.pdf' },
-  { label: 'Dokumen Hukum dan Perizinan', file: 'HukumDanPerizinanInvestasi.pdf' },
   { label: 'Template Perjanjian Investor', file: 'DokumenPerjanjian.pdf' },
 ];
 

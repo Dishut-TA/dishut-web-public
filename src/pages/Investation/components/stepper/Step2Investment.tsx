@@ -53,11 +53,6 @@ const Step2Investment = ({ onNext, onBack }: { onNext: () => void; onBack: () =>
         <p className="text-xs text-[#4F6352] mt-1.5">Input nominal jika jumlah tidak tersedia</p>
       </div>
 
-      <div className="mb-4">
-        <input type="text" value="*Presentase Keuntungan*" className={`${inputStyle} text-[#4F6352] bg-gray-50/50 cursor-not-allowed`} readOnly disabled />
-        <p className="text-xs text-[#4F6352] mt-1.5">Pembagian keuntungan sesuai dengan perjanjian 60:40</p>
-      </div>
-
       <div className="mb-8 relative" ref={dropdownRef}>
         <label className="text-sm text-[#333] font-medium block mb-2">Pilih Metode Pembayaran</label>
         <button 

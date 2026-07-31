@@ -1,127 +1,123 @@
-import React, { useState } from 'react';
-import { HiSearch } from 'react-icons/hi';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { HiOutlineFunnel, HiOutlineEye } from 'react-icons/hi2';
 
-interface LaporanData {
+interface LaporanKeuanganData {
   id: string;
+  no: number;
+  periode: string;
   namaInvestasi: string;
-  tanggal: string;
-  pendapatan: number;
-  pengeluaran: number;
-  keuntungan: number;
-  kerugian: number;
+  totalPendapatan: string;
+  totalPengeluaran: string;
+  labaBersih: string;
+  status: string;
 }
 
-const mockLaporanData: LaporanData[] = [
+const mockData: LaporanKeuanganData[] = [
   {
-    id: '1',
-    namaInvestasi: 'Pembangunan Ekowisata Pinus',
-    tanggal: '01/01/2024',
-    pendapatan: 10000000,
-    pengeluaran: 5000000,
-    keuntungan: 5000000,
-    kerugian: 0,
+    id: 'LK-001',
+    no: 1,
+    periode: 'Jan - Juni 2025',
+    namaInvestasi: 'Ekowisata Kebun Stroberi',
+    totalPendapatan: 'Rp 120.000.000',
+    totalPengeluaran: 'Rp 80.000.000',
+    labaBersih: 'Rp 40.000.000',
+    status: 'Menunggu Pembagian',
   },
   {
-    id: '2',
+    id: 'LK-002',
+    no: 2,
+    periode: 'Jan - Juni 2025',
     namaInvestasi: 'Ekowisata Kebun Stroberi',
-    tanggal: '15/02/2024',
-    pendapatan: 8000000,
-    pengeluaran: 8500000,
-    keuntungan: 0,
-    kerugian: 500000,
+    totalPendapatan: 'Rp 120.000.000',
+    totalPengeluaran: 'Rp 80.000.000',
+    labaBersih: 'Rp 40.000.000',
+    status: 'Sudah Dibagikan',
   }
 ];
 
 const LaporanKeuangan: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
-  const filteredData = mockLaporanData.filter((data) =>
-    data.namaInvestasi.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const formatRupiah = (amount: number) => {
-    if (amount === 0) return '-';
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(amount).replace('Rp', 'Rp.');
+  const getStatusColor = (status: string) => {
+    if (status === 'Menunggu Pembagian') return 'text-orange-500';
+    if (status === 'Sudah Dibagikan') return 'text-[#185325]';
+    return 'text-gray-800';
   };
 
   return (
-    <div className="animate-[fadeIn_0.3s_ease-out]">
+    <div className="animate-[fadeIn_0.3s_ease-out] w-full max-w-screen-2xl mx-auto pb-8">
+      
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-        <h1 className="text-xl md:text-2xl font-bold text-primary">
+        <h1 className="text-xl md:text-2xl font-bold text-[#185325]">
           Laporan Keuangan
         </h1>
         
-        <div className="relative w-full md:w-80">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-primary/60">
-            <HiSearch size={20} />
-            <span className="text-primary/30 text-lg font-light leading-none">|</span>
-          </div>
-          <input 
-            type="text" 
-            placeholder="Search" 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-14 pr-4 py-2.5 rounded-full border border-primary text-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all text-sm font-medium placeholder:text-primary/60 bg-transparent"
-          />
-        </div>
+        <button className="flex items-center gap-2 px-4 py-2 border border-[#185325] text-[#185325] text-sm font-semibold rounded-lg hover:bg-[#185325]/5 transition-colors">
+          <HiOutlineFunnel className="w-5 h-5" /> Filter
+        </button>
       </div>
 
-      <div className="w-full overflow-x-auto">
+      {/* Tabel */}
+      <div className="w-full overflow-x-auto rounded-lg">
         <table className="w-full text-left whitespace-nowrap">
           <thead>
-            <tr className="border-b border-primary text-primary font-semibold text-xs tracking-wide">
-              <th className="py-4 px-2 md:px-4 uppercase">Nama Investasi</th>
-              <th className="py-4 px-2 md:px-4 uppercase">Tanggal</th>
-              <th className="py-4 px-2 md:px-4 uppercase">Biaya Pendapatan</th>
-              <th className="py-4 px-2 md:px-4 uppercase">Biaya Pengeluaran</th>
-              <th className="py-4 px-2 md:px-4 uppercase">Keuntungan</th>
-              <th className="py-4 px-2 md:px-4 uppercase">Kerugian</th>
+            <tr className="border-b border-[#185325] text-[#185325] font-bold text-xs tracking-wide">
+              <th className="py-4 px-4 uppercase text-center w-16">No</th>
+              <th className="py-4 px-4 uppercase">Periode</th>
+              <th className="py-4 px-4 uppercase">Nama Investasi</th>
+              <th className="py-4 px-4 uppercase">Total Pendapatan</th>
+              <th className="py-4 px-4 uppercase">Total Pengeluaran</th>
+              <th className="py-4 px-4 uppercase">Laba Bersih</th>
+              <th className="py-4 px-4 uppercase">Status</th>
+              <th className="py-4 px-4 uppercase text-center w-24">Aksi</th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((data) => (
-                <tr 
-                  key={data.id} 
-                  className="border-b border-primary/30 transition-colors duration-200 text-sm font-bold hover:bg-gray-50/50"
-                >
-                  <td className="py-6 px-2 md:px-4 text-primary">
-                    {data.namaInvestasi}
-                  </td>
-                  <td className="py-6 px-2 md:px-4 text-primary">
-                    {data.tanggal}
-                  </td>
-                  <td className="py-6 px-2 md:px-4 text-primary">
-                    {formatRupiah(data.pendapatan)}
-                  </td>
-                  <td className="py-6 px-2 md:px-4 text-primary">
-                    {formatRupiah(data.pengeluaran)}
-                  </td>
-                  <td className="py-6 px-2 md:px-4 text-primary">
-                    {formatRupiah(data.keuntungan)}
-                  </td>
-                  <td className="py-6 px-2 md:px-4 text-primary">
-                    {formatRupiah(data.kerugian)}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="py-12 text-center text-gray-400 font-medium text-sm">
-                  Laporan keuangan tidak ditemukan.
+            {mockData.map((data, idx) => (
+              <tr 
+                key={data.id} 
+                className="border-b border-[#185325]/20 transition-colors duration-200 text-sm font-bold hover:bg-gray-50/50"
+              >
+                <td className="py-5 px-4 text-[#185325] text-center">
+                  {idx + 1}
+                </td>
+                <td className="py-5 px-4 text-[#185325]">
+                  {data.periode}
+                </td>
+                <td className="py-5 px-4 text-[#185325]">
+                  {data.namaInvestasi}
+                </td>
+                <td className="py-5 px-4 text-[#185325]">
+                  {data.totalPendapatan}
+                </td>
+                <td className="py-5 px-4 text-[#185325]">
+                  {data.totalPengeluaran}
+                </td>
+                <td className="py-5 px-4 text-[#185325]">
+                  {data.labaBersih}
+                </td>
+                <td className={`py-5 px-4 ${getStatusColor(data.status)}`}>
+                  {data.status}
+                </td>
+                <td className="py-5 px-4 flex justify-center items-center">
+                  <button 
+                    title="Lihat Detail"
+                    onClick={() => navigate(`/laporan-investasi/keuangan/${data.id}`)}
+                    className="p-1.5 text-[#185325] hover:bg-[#185325]/10 rounded-full transition-colors"
+                  >
+                    <HiOutlineEye className="w-5 h-5" />
+                  </button>
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
 
     </div>
   );
-};
+}
 
 export default LaporanKeuangan;
