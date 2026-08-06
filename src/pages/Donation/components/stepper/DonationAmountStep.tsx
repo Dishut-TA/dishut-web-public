@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronDown, FiMinus, FiPlus } from "react-icons/fi";
 import { type DonationFormData, type SelectedBibit } from "./DonationStepper";
 import { ToastError } from "@/utils/toast";
+import { getBibit } from "@/services/bibit.service";
 
 interface DonationAmountStepProps {
   selectedBibits: SelectedBibit[];
@@ -30,13 +31,6 @@ const paymentOptions: PaymentOption[] = [
   { id: "mandiri", label: "Bank Mandiri", code: "MDR" },
 ];
 
-const bibitOptions: BibitOption[] = [
-  { id: "spec-001", label: "Mahoni", tinggi: "30–60 cm", price: 15000, stock: 150 },
-  { id: "spec-002", label: "Sengon", tinggi: "61–100 cm", price: 10000, stock: 300 },
-  { id: "spec-003", label: "Mangrove", tinggi: "> 100 cm", price: 20000, stock: 50 },
-  { id: "spec-004", label: "Alpukat", tinggi: "70–100 cm", price: 25000, stock: 100 },
-];
-
 const formatRupiah = (num: number) =>
   new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -51,6 +45,34 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
 }) => {
   const [isOpenPayment, setIsOpenPayment] = useState(false);
   const paymentWrapperRef = useRef<HTMLDivElement | null>(null);
+  const [bibitOptions, setBibitOptions] = useState<BibitOption[]>([]);
+  const [isLoadingBibit, setIsLoadingBibit] = useState(true);
+
+  useEffect(() => {
+    const fetchBibit = async () => {
+      try {
+        const response = await getBibit()
+
+        const mappedBibit: BibitOption[] = response.payload.map((item: any) => ({
+          id: item.id.toString(), // Pastikan ID berupa string agar selaras dengan logic UI
+          label: item.nama,
+          // --- FALLBACK ATTRIBUTES ---
+          tinggi: "30-60 cm", // Data dummy tinggi
+          price: 15000,       // Data dummy harga (Rp 15.000)
+          stock: 100,         // Data dummy stok
+        }));
+
+        setBibitOptions(mappedBibit);
+      } catch (error) {
+        console.error("Gagal memuat data bibit:", error);
+        ToastError("Gagal mengambil data bibit dari server.");
+      } finally {
+        setIsLoadingBibit(false);
+      }
+    };
+
+    fetchBibit();
+  }, []);
 
   const totalPembayaran = useMemo(
     () => selectedBibits.reduce((acc, curr) => acc + curr.price * curr.quantity, 0),
@@ -148,56 +170,65 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
         <label className="mb-2 block text-sm font-medium text-primary">
           Pilih Bibit & Jumlah
         </label>
-        <div className="grid grid-cols-1 gap-3">
-          {bibitOptions.map((bibit) => {
-            const selected = selectedBibits.find((b) => b.id === bibit.id);
-            const quantity = selected?.quantity || 0;
+        
+        {isLoadingBibit ? (
+          <div className="grid grid-cols-1 gap-3 animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-20 rounded-2xl bg-gray-200 w-full" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 max-h-72 overflow-y-auto pr-1">
+            {bibitOptions.map((bibit) => {
+              const selected = selectedBibits.find((b) => b.id === bibit.id);
+              const quantity = selected?.quantity || 0;
 
-            return (
-              <div
-                key={bibit.id}
-                className="flex items-center justify-between rounded-2xl border border-[#98C98A] bg-transparent p-4 transition-all duration-300 hover:shadow-sm"
-              >
-                <div>
-                  <h4 className="text-sm font-semibold text-primary">
-                    {bibit.label} <span className="font-normal text-primary/70">({bibit.tinggi})</span>
-                  </h4>
-                  <p className="text-sm text-primary/70 mt-0.5">
-                    {formatRupiah(bibit.price)} <span className="text-xs ml-1 text-primary/50">| Stok: {bibit.stock}</span>
-                  </p>
-                </div>
-                
-                <div className="flex items-center gap-2 rounded-full border border-[#98C98A] px-2 py-1.5 bg-white">
-                  <button
-                    type="button"
-                    onClick={() => handleQuantityChange(bibit.id, -1, bibit.stock)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-primary transition-colors hover:bg-gray-100 disabled:opacity-30 active:scale-95"
-                    disabled={quantity === 0}
-                  >
-                    <FiMinus size={14} />
-                  </button>
+              return (
+                <div
+                  key={bibit.id}
+                  className="flex items-center justify-between rounded-2xl border border-[#98C98A] bg-transparent p-4 transition-all duration-300 hover:shadow-sm"
+                >
+                  <div>
+                    <h4 className="text-sm font-semibold text-primary">
+                      {bibit.label} <span className="font-normal text-primary/70">({bibit.tinggi})</span>
+                    </h4>
+                    <p className="text-sm text-primary/70 mt-0.5">
+                      {formatRupiah(bibit.price)} <span className="text-xs ml-1 text-primary/50">| Stok: {bibit.stock}</span>
+                    </p>
+                  </div>
                   
-                  <input
-                    type="text"
-                    value={quantity === 0 ? "" : quantity}
-                    onChange={(e) => handleManualInput(bibit.id, e.target.value, bibit.stock)}
-                    placeholder="0"
-                    className="w-10 text-center text-sm font-medium text-primary bg-transparent outline-none"
-                  />
-                  
-                  <button
-                    type="button"
-                    onClick={() => handleQuantityChange(bibit.id, 1, bibit.stock)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-primary transition-colors hover:bg-gray-100 disabled:opacity-30 active:scale-95"
-                    disabled={quantity >= bibit.stock}
-                  >
-                    <FiPlus size={14} />
-                  </button>
+                  <div className="flex items-center gap-2 rounded-full border border-[#98C98A] px-2 py-1.5 bg-white">
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(bibit.id, -1, bibit.stock)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-primary transition-colors hover:bg-gray-100 disabled:opacity-30 active:scale-95 cursor-pointer"
+                      disabled={quantity === 0}
+                    >
+                      <FiMinus size={14} />
+                    </button>
+                    
+                    <input
+                      type="text"
+                      value={quantity === 0 ? "" : quantity}
+                      onChange={(e) => handleManualInput(bibit.id, e.target.value, bibit.stock)}
+                      placeholder="0"
+                      className="w-10 text-center text-sm font-medium text-primary bg-transparent outline-none"
+                    />
+                    
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(bibit.id, 1, bibit.stock)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-primary transition-colors hover:bg-gray-100 disabled:opacity-30 active:scale-95 cursor-pointer"
+                      disabled={quantity >= bibit.stock}
+                    >
+                      <FiPlus size={14} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div>
@@ -221,7 +252,7 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
           </button>
 
           <div 
-            className={`absolute left-0 z-10 mt-2 w-full overflow-hidden rounded-2xl border border-primary/10 bg-white/90 backdrop-blur-md shadow-xl transition-all duration-300 ease-out origin-top ${
+            className={`absolute left-0 z-100 mt-2 w-full overflow-hidden rounded-2xl border border-primary/10 bg-white/90 backdrop-blur-md shadow-xl transition-all duration-300 ease-out origin-top ${
               isOpenPayment 
                 ? "scale-100 opacity-100 translate-y-0 visible pointer-events-auto" 
                 : "scale-95 opacity-0 -translate-y-3 invisible pointer-events-none"

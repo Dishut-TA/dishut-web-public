@@ -3,6 +3,7 @@ import { type DonationFormData } from "./DonationStepper";
 
 interface DonationIdentityStepProps {
   name: string;
+  address: string;
   onChange: (field: keyof DonationFormData, value: any) => void;
 }
 
@@ -11,6 +12,7 @@ const inputClassName =
 
 const DonationIdentityStep: React.FC<DonationIdentityStepProps> = ({
   name,
+  address, 
   onChange,
 }) => {
   const [isAnonymous, setIsAnonymous] = useState<boolean>(name === "Orang Baik");
@@ -20,8 +22,10 @@ const DonationIdentityStep: React.FC<DonationIdentityStepProps> = ({
     setIsAnonymous(checked);
     if (checked) {
       onChange("name", "Orang Baik");
+      onChange("address", "Tidak Diketahui"); 
     } else {
       onChange("name", "");
+      onChange("address", "");
     }
   };
 
@@ -42,9 +46,7 @@ const DonationIdentityStep: React.FC<DonationIdentityStepProps> = ({
 
       {!isAnonymous && (
         <div>
-          <label className="mb-2 block text-sm font-medium text-primary">
-            Nama Lengkap
-          </label>
+          <label className="mb-2 block text-sm font-medium text-primary">Nama Lengkap</label>
           <input
             type="text"
             placeholder="Input Nama"
@@ -52,14 +54,12 @@ const DonationIdentityStep: React.FC<DonationIdentityStepProps> = ({
             onChange={(e) => onChange("name", e.target.value)}
             className={inputClassName}
           />
-          <label className="mb-2 mt-4 block text-sm font-medium text-primary">
-            Alamat
-          </label>
+          <label className="mb-2 mt-4 block text-sm font-medium text-primary">Alamat</label>
           <input
             type="text"
             placeholder="Input Alamat"
-            value={name === "Orang Baik" ? "" : name}
-            onChange={(e) => onChange("name", e.target.value)}
+            value={address === "Tidak Diketahui" ? "" : address}
+            onChange={(e) => onChange("address", e.target.value)}
             className={inputClassName}
           />
         </div>

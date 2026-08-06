@@ -15,6 +15,7 @@ export interface SelectedBibit {
 
 export interface DonationFormData {
   name: string;
+  address: string; 
   amount: string;
   selectedBibits: SelectedBibit[];
   paymentMethod: string;
@@ -63,6 +64,7 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
         {currentStep === 1 && (
           <DonationIdentityStep
             name={formData.name}
+            address={formData.address}
             onChange={onChange}
           />
         )}

@@ -1,50 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FiArrowLeft, FiClock, FiShare2, FiUsers } from "react-icons/fi";
+import { useParams, useNavigate } from "react-router-dom";
 import AllocationTable, { type AllocationItem } from "../components/AllocationTable";
 import DonorList from "../components/DonorList";
 import ProgramSummaryCard from "../components/ProgramSummaryCard";
+import { getDonationProgramByIdAPI } from "@/services/program-donasi.service";
 
-const donationDetail = {
-  id: 1,
-  title: "Rehabilitasi Hutan DAS Cimanuk",
-  description: "Lorem ipsum dolor sit amet consectetur...",
-  location: "Garut, Jawa Barat",
-  image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-  
-  collectedBibit: 13000, 
-  targetBibit: 20000,
-  collectedDana: 1200000,
-  status: "Aktif",
-  
-  donorCount: 20,
-  remainingDays: 25,
-  
-  allocationTitle: "Alokasi Dana (100% Pembelian Bibit)",
-  allocations: [
-    {
-      id: 1,
-      label: "Pembelanjaan Bibit Sengon",
-      percentage: 100,
-      amount: 1200000,
-      isStrikethrough: false,
-    },
-  ] as AllocationItem[],
-};
-
-const donors = [
+// Mock Data Sementara untuk fitur yang belum ada di backend
+const mockDonors = [
   { id: 1, name: "Raisha Nabila", amount: 20000, timeAgo: "15 menit yang lalu" },
   { id: 2, name: "Muhamein Iskandar", amount: 10000, timeAgo: "25 menit yang lalu" },
   { id: 3, name: "Debora Ananta", amount: 10000, timeAgo: "30 menit yang lalu" },
 ];
 
+const mockAllocations = [
+  {
+    id: 1,
+    label: "Pembelanjaan Bibit Tanaman",
+    percentage: 100,
+    amount: 1200000,
+    isStrikethrough: false,
+  },
+] as AllocationItem[];
+
 const DonasiDetail: React.FC = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [program, setProgram] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        if (!id) return;
+        const response = await getDonationProgramByIdAPI(id);
+        setProgram(response.payload);
+      } catch (error) {
+        console.error("Gagal memuat detail:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDetail();
+  }, [id]);
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center bg-customWhite text-primary">Memuat Detail Program...</div>;
+  }
+
+  if (!program) {
+    return <div className="min-h-screen flex items-center justify-center bg-customWhite text-primary">Program tidak ditemukan!</div>;
+  }
+
   return (
     <div className="min-h-screen bg-customWhite">
       <main className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-28 lg:px-12">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           <section className="lg:col-span-6 xl:col-span-6">
             <button
-              type="button"
+              onClick={() => navigate(-1)}
               className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-primary transition hover:opacity-80"
             >
               <FiArrowLeft className="text-base" />
@@ -52,28 +66,25 @@ const DonasiDetail: React.FC = () => {
             </button>
 
             <h1 className="text-3xl font-semibold leading-tight text-primary md:text-4xl">
-              {donationDetail.title}
+              {program.name}
             </h1>
 
             <p className="mt-4 max-w-3xl text-sm leading-7 text-primary/80 md:text-base">
-              {donationDetail.description}
+              {program.description || "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan di wilayah Jawa Barat."}
             </p>
 
             <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-primary/80">
               <div className="flex items-center gap-2">
                 <FiUsers className="text-base" />
-                <span>{donationDetail.donorCount} donatur</span>
+                <span>20 donatur</span> {/* Mock */}
               </div>
 
               <div className="flex items-center gap-2">
                 <FiClock className="text-base" />
-                <span>Tersisa {donationDetail.remainingDays} hari lagi</span>
+                <span>Tersisa 25 hari lagi</span> {/* Mock */}
               </div>
 
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 transition hover:opacity-80"
-              >
+              <button type="button" className="inline-flex items-center gap-2 transition hover:opacity-80">
                 <FiShare2 className="text-base" />
                 <span>Bagikan</span>
               </button>
@@ -81,9 +92,9 @@ const DonasiDetail: React.FC = () => {
 
             <div className="mt-10">
                 <AllocationTable
-                title={donationDetail.allocationTitle}
-                items={donationDetail.allocations}
-                totalAmount={donationDetail.collectedDana}
+                title="Alokasi Dana (100% Pembelian Bibit)"
+                items={mockAllocations}
+                totalAmount={1200000} // Mock total dana
                 />
             </div>
 
@@ -91,18 +102,18 @@ const DonasiDetail: React.FC = () => {
               <h2 className="mb-4 text-xl font-semibold text-primary md:text-2xl">
                 Donatur Terbaru
               </h2>
-
-              <DonorList donors={donors} />
+              <DonorList donors={mockDonors} />
             </div>
           </section>
 
           <aside className="lg:col-span-6 xl:col-span-6">
             <ProgramSummaryCard
-            title={donationDetail.title}
-            location={donationDetail.location}
-            image={donationDetail.image}
-            collected={donationDetail.collectedBibit}
-            status={donationDetail.status as "Aktif" | "Non-Aktif"}
+              programId={Number(program.id)}
+              title={program.name}
+              location={program.location}
+              image={program.image || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"}
+              collected={program.total_seeds_collected}
+              status="Aktif"
             />
           </aside>
         </div>

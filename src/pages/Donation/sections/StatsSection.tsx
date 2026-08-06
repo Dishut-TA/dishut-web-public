@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import ProgramCard from "@/components/ProgramCard";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { getDonationProgramsAPI } from "@/services/program-donasi.service";
 
 type StatItem = {
   value: string;
@@ -14,50 +16,31 @@ const stats: StatItem[] = [
   { value: "1000+", label: "Sedang Diproses" },
 ];
 
-// DATA diperbarui agar sesuai dengan tipe props ProgramCard terbaru
-const DATA = [
-  {
-    id: 1,
-    title: "Pemulihan Lahan Kritis Cisadane",
-    location: "Kabupaten Bogor",
-    description:
-      "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-    collected: "2000",
-    status: "Aktif" as const,
-  },
-  {
-    id: 2,
-    title: "Rehabilitasi Hutan DAS Cimanuk",
-    location: "Garut, Jawa Barat",
-    description:
-      "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan.",
-    image:
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80",
-    collected: "13.000",
-    status: "Aktif" as const,
-  },
-  {
-    id: 3,
-    title: "Pemulihan Kawasan Resapan Air",
-    location: "Bandung, Jawa Barat",
-    description:
-      "Dukung pemulihan kawasan resapan air melalui penanaman vegetasi dan penguatan ekosistem daerah tangkapan air.",
-    image:
-      "https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?auto=format&fit=crop&w=1200&q=80",
-    collected: "9.500",
-    status: "Aktif" as const,
-  },
-];
-
 const StatsSection = () => {
   const navigate = useNavigate();
+  const [programs, setPrograms] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await getDonationProgramsAPI();
+        // Hanya tampilkan program yang Aktif, dan batasi 3 item saja untuk Beranda
+        const activePrograms = response.payload
+          .filter((p: any) => p.status.toLowerCase() === 'active' || p.status.toLowerCase() === 'aktif')
+          .slice(0, 3);
+        setPrograms(activePrograms);
+      } catch (error) {
+        console.error("Gagal memuat data program:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPrograms();
+  }, []);
 
   return (
     <section className="relative z-20 bg-customWhite">
-
-      {/* FLOATING STATS CARD */}
       <div className="px-4 -mb-12 md:-mb-16 relative z-10">
         <div className="flex justify-center">
           <div className="w-full max-w-2xl bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] px-6 py-5 md:px-10 md:py-6">
@@ -77,14 +60,9 @@ const StatsSection = () => {
         </div>
       </div>
 
-      {/* MAIN BG SECTION */}
       <div className="bg-secondary w-full rounded-t-[28rem] pt-20 md:pt-24 pb-12 px-4 md:px-6">
-        
         <div className="max-w-6xl mx-auto">
-
-          {/* HEADER */}
           <div className="flex flex-col md:flex-row items-center justify-between mt-20 gap-4 mb-8 md:mb-10">
-            
             <h1 className="text-lg md:text-xl font-semibold text-customWhite text-center md:text-left">
               Bersama Kita Pulihkan Hutan Jawa Barat
             </h1>
@@ -98,20 +76,31 @@ const StatsSection = () => {
             />
           </div>
 
-          {/* PROGRAM GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {DATA.map((item) => (
-              <ProgramCard 
-                key={item.id} 
-                {...item} 
-                onClick={() => navigate(`/donasi/detail/${item.id}`)} 
-              />
-            ))}
+            {isLoading ? (
+              <div className="col-span-3 text-center text-white py-10">Memuat program donasi...</div>
+            ) : programs.length > 0 ? (
+              programs.map((item) => (
+                <ProgramCard 
+                  key={item.id} 
+                  id={item.id}
+                  title={item.name}
+                  location={item.location}
+                  // Menggunakan placeholder jika backend belum punya field ini
+                  description={item.description || "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan."}
+                  image={item.image || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"}
+                  collected={item.total_seeds_collected.toString()}
+                  status="Aktif" 
+                  onClick={() => navigate(`/donasi/detail/${item.id}`)} 
+                />
+              ))
+            ) : (
+              <div className="col-span-3 text-center text-white py-10">Belum ada program donasi aktif.</div>
+            )}
           </div>
 
         </div>
       </div>
-
     </section>
   );
 };
