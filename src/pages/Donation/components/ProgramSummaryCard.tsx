@@ -21,7 +21,7 @@ interface ProgramSummaryCardProps {
   location: string;
   image: string;
   collected: number;
-  // HAPUS properti target disini
+  jenisBibit: any[];
   status: "Aktif" | "Non-Aktif";
 }
 
@@ -38,6 +38,7 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
   location,
   image,
   collected,
+  jenisBibit,
   status,
 }) => {
   const { user } = useAuth();
@@ -225,6 +226,7 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
               onNext={handleNext}
               onBack={handleBack}
               onCheckStatus={handleSubmitDonasi}
+              jenisBibit={jenisBibit}
               isSubmitting={isSubmitting}
             />
           </motion.div>

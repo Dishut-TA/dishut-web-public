@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import ProgramCard from "@/components/ProgramCard";
 import { FiSearch } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +15,9 @@ const DonasiExplore: React.FC = () => {
       try {
         const response = await getDonationProgramsAPI();
         const activePrograms = response.payload.filter(
-          (p: any) => p.status.toLowerCase() === 'active' || p.status.toLowerCase() === 'aktif'
+          (p: any) => 
+            p.status.toLowerCase() === 'active' || 
+            p.status.toLowerCase() === 'aktif'
         );
         setPrograms(activePrograms);
       } catch (error) {
@@ -44,7 +46,7 @@ const DonasiExplore: React.FC = () => {
         <section className="mb-8 md:mb-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <h1 className="text-2xl font-semibold leading-tight text-primary md:text-4xl mt-4 ">
+              <h1 className="text-2xl font-semibold leading-tight text-primary md:text-4xl mt-4">
                 Jelajahi Program
               </h1>
               <p className="mt-3 text-sm text-primary/80 md:text-base">
@@ -79,9 +81,9 @@ const DonasiExplore: React.FC = () => {
                   title={program.name}
                   location={program.location}
                   description={program.description || "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan."}
-                  image={program.image || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"}
-                  collected={program.total_seeds_collected.toString()}
-                  status="Aktif" 
+                  image={program.image_url || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"}
+                  collected={program.total_seeds_collected.toLocaleString('id-ID')}
+                  status={program.status} // Mengambil status langsung dari API (misal: "Aktif" / "Menunggu Verifikasi")
                   onClick={() => navigate(`/donasi/detail/${program.id}`)} 
                 />
               ))}

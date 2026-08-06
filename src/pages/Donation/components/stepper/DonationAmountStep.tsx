@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronDown, FiMinus, FiPlus } from "react-icons/fi";
 import { type DonationFormData, type SelectedBibit } from "./DonationStepper";
 import { ToastError } from "@/utils/toast";
-import { getBibit } from "@/services/bibit.service";
 
 interface DonationAmountStepProps {
+  jenisBibit: any[]; // <-- Menerima jenis bibit spesifik dari program
   selectedBibits: SelectedBibit[];
   paymentMethod: string;
   onChange: (field: keyof DonationFormData, value: any) => void;
@@ -39,40 +39,24 @@ const formatRupiah = (num: number) =>
   }).format(num);
 
 const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
+  jenisBibit = [],
   selectedBibits,
   paymentMethod,
   onChange,
 }) => {
   const [isOpenPayment, setIsOpenPayment] = useState(false);
   const paymentWrapperRef = useRef<HTMLDivElement | null>(null);
-  const [bibitOptions, setBibitOptions] = useState<BibitOption[]>([]);
-  const [isLoadingBibit, setIsLoadingBibit] = useState(true);
 
-  useEffect(() => {
-    const fetchBibit = async () => {
-      try {
-        const response = await getBibit()
-
-        const mappedBibit: BibitOption[] = response.payload.map((item: any) => ({
-          id: item.id.toString(), // Pastikan ID berupa string agar selaras dengan logic UI
-          label: item.nama,
-          // --- FALLBACK ATTRIBUTES ---
-          tinggi: "30-60 cm", // Data dummy tinggi
-          price: 15000,       // Data dummy harga (Rp 15.000)
-          stock: 100,         // Data dummy stok
-        }));
-
-        setBibitOptions(mappedBibit);
-      } catch (error) {
-        console.error("Gagal memuat data bibit:", error);
-        ToastError("Gagal mengambil data bibit dari server.");
-      } finally {
-        setIsLoadingBibit(false);
-      }
-    };
-
-    fetchBibit();
-  }, []);
+  // Mapping data jenis_bibit yang didapat dari detail program
+  const bibitOptions: BibitOption[] = useMemo(() => {
+    return jenisBibit.map((item: any) => ({
+      id: item.id.toString(),
+      label: item.nama || item.name,
+      tinggi: "30-60 cm", // Bisa disesuaikan jika API mengirim data tinggi/spesifikasi
+      price: item.price ? Number(item.price) : 15000, 
+      stock: item.stock ?? 100, 
+    }));
+  }, [jenisBibit]);
 
   const totalPembayaran = useMemo(
     () => selectedBibits.reduce((acc, curr) => acc + curr.price * curr.quantity, 0),
@@ -171,11 +155,9 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
           Pilih Bibit & Jumlah
         </label>
         
-        {isLoadingBibit ? (
-          <div className="grid grid-cols-1 gap-3 animate-pulse">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 rounded-2xl bg-gray-200 w-full" />
-            ))}
+        {bibitOptions.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[#98C98A] p-6 text-center text-sm text-primary/70">
+            Tidak ada bibit yang tersedia untuk program ini.
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3 max-h-72 overflow-y-auto pr-1">
@@ -231,6 +213,7 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
         )}
       </div>
 
+      {/* Bagian Metode Pembayaran & Ringkasan Transaksi tetap sama */}
       <div>
         <label className="mb-2 block text-sm font-medium text-primary">
           Pilih Metode Pembayaran
@@ -252,7 +235,7 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
           </button>
 
           <div 
-            className={`absolute left-0 z-100 mt-2 w-full overflow-hidden rounded-2xl border border-primary/10 bg-white/90 backdrop-blur-md shadow-xl transition-all duration-300 ease-out origin-top ${
+            className={`absolute left-0 z-100 mt-2 w-full overflow-hidden rounded-2xl border border-primary/10 bg-white/95 backdrop-blur-md shadow-xl transition-all duration-300 ease-out origin-top ${
               isOpenPayment 
                 ? "scale-100 opacity-100 translate-y-0 visible pointer-events-auto" 
                 : "scale-95 opacity-0 -translate-y-3 invisible pointer-events-none"
@@ -291,7 +274,7 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl bg-[#DCECE0]/60 p-5 transition-all duration-300 hover:bg-[#DCECE0]/80">
+      <div className="mt-6 rounded-2xl bg-[#DCECE0]/60 p-5">
         <h3 className="text-base font-bold text-primary mb-4">
           Ringkasan Transaksi
         </h3>
@@ -299,10 +282,10 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
         <div className="space-y-3 text-sm text-primary/80 font-medium">
           {selectedBibits.length > 0 ? (
              selectedBibits.map((item) => (
-                <div key={item.id} className="flex justify-between items-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <span>{item.quantity}x Bibit {item.label} ({item.tinggi})</span>
-                  <span>{formatRupiah(item.price * item.quantity)}</span>
-                </div>
+               <div key={item.id} className="flex justify-between items-center">
+                 <span>{item.quantity}x Bibit {item.label} ({item.tinggi})</span>
+                 <span>{formatRupiah(item.price * item.quantity)}</span>
+               </div>
              ))
           ) : (
             <div className="text-center italic text-primary/50 py-2">Belum ada bibit yang dipilih</div>
