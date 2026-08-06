@@ -5,13 +5,7 @@ import AllocationTable, { type AllocationItem } from "../components/AllocationTa
 import DonorList from "../components/DonorList";
 import ProgramSummaryCard from "../components/ProgramSummaryCard";
 import { getDonationProgramByIdAPI } from "@/services/program-donasi.service";
-
-// Mock Data Sementara untuk fitur yang belum ada di backend
-const mockDonors = [
-  { id: 1, name: "Raisha Nabila", amount: 20000, timeAgo: "15 menit yang lalu" },
-  { id: 2, name: "Muhamein Iskandar", amount: 10000, timeAgo: "25 menit yang lalu" },
-  { id: 3, name: "Debora Ananta", amount: 10000, timeAgo: "30 menit yang lalu" },
-];
+import { getDonorsAPI } from "@/services/donor.service"; // Service donatur baru
 
 const mockAllocations = [
   {
@@ -27,21 +21,38 @@ const DonasiDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [program, setProgram] = useState<any>(null);
+  const [donors, setDonors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDetail = async () => {
+    const fetchData = async () => {
       try {
         if (!id) return;
-        const response = await getDonationProgramByIdAPI(id);
-        setProgram(response.payload);
+        // Ambil detail program dan data donatur secara paralel
+        const [programRes, donorsRes] = await Promise.all([
+          getDonationProgramByIdAPI(id),
+          getDonorsAPI().catch(() => ({ payload: [] })) // Fallback jika gagal
+        ]);
+
+        setProgram(programRes.payload);
+        
+        // Mapping data donatur dari API agar sesuai dengan komponen DonorList
+        const rawDonors = Array.isArray(donorsRes.payload) ? donorsRes.payload : [donorsRes.payload].filter(Boolean);
+        const mappedDonors = rawDonors.map((d: any, index: number) => ({
+          id: d.id || index,
+          name: d.donor_name || "Hamba Allah",
+          amount: 50000, // Menyesuaikan jika ada field nominal di donor/donasi
+          timeAgo: "Baru saja"
+        }));
+        setDonors(mappedDonors);
+
       } catch (error) {
         console.error("Gagal memuat detail:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchDetail();
+    fetchData();
   }, [id]);
 
   if (isLoading) {
@@ -59,7 +70,7 @@ const DonasiDetail: React.FC = () => {
           <section className="lg:col-span-6 xl:col-span-6">
             <button
               onClick={() => navigate(-1)}
-              className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-primary transition hover:opacity-80"
+              className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-primary transition hover:opacity-80 cursor-pointer"
             >
               <FiArrowLeft className="text-base" />
               <span>Kembali</span>
@@ -70,21 +81,21 @@ const DonasiDetail: React.FC = () => {
             </h1>
 
             <p className="mt-4 max-w-3xl text-sm leading-7 text-primary/80 md:text-base">
-              {program.description || "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan di wilayah Jawa Barat."}
+              {program.description || "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan."}
             </p>
 
             <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-primary/80">
               <div className="flex items-center gap-2">
                 <FiUsers className="text-base" />
-                <span>20 donatur</span> {/* Mock */}
+                <span>{donors.length} donatur</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <FiClock className="text-base" />
-                <span>Tersisa 25 hari lagi</span> {/* Mock */}
+                <span>Program Aktif</span>
               </div>
 
-              <button type="button" className="inline-flex items-center gap-2 transition hover:opacity-80">
+              <button type="button" className="inline-flex items-center gap-2 transition hover:opacity-80 cursor-pointer">
                 <FiShare2 className="text-base" />
                 <span>Bagikan</span>
               </button>
@@ -94,7 +105,7 @@ const DonasiDetail: React.FC = () => {
                 <AllocationTable
                 title="Alokasi Dana (100% Pembelian Bibit)"
                 items={mockAllocations}
-                totalAmount={1200000} // Mock total dana
+                totalAmount={1200000}
                 />
             </div>
 
@@ -102,7 +113,7 @@ const DonasiDetail: React.FC = () => {
               <h2 className="mb-4 text-xl font-semibold text-primary md:text-2xl">
                 Donatur Terbaru
               </h2>
-              <DonorList donors={mockDonors} />
+              <DonorList donors={donors} />
             </div>
           </section>
 
@@ -111,9 +122,10 @@ const DonasiDetail: React.FC = () => {
               programId={Number(program.id)}
               title={program.name}
               location={program.location}
-              image={program.image || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"}
+              image={program.image_url || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"}
               collected={program.total_seeds_collected}
-              status="Aktif"
+              status={program.status || "Aktif"}
+              jenisBibit={program.jenis_bibit || []} 
             />
           </aside>
         </div>

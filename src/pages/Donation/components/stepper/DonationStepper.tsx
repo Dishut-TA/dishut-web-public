@@ -25,6 +25,7 @@ export interface DonationFormData {
 
 interface DonationStepperProps {
   currentStep: number;
+  jenisBibit?: any[];
   formData: DonationFormData;
   isSubmitting?: boolean;
   onChange: (field: keyof DonationFormData, value: any) => void;
@@ -45,6 +46,7 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
   currentStep,
   formData,
   isSubmitting,
+  jenisBibit = [],
   onChange,
   onNext,
   onBack,
@@ -72,6 +74,7 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
         {currentStep === 2 && (
           <DonationAmountStep
             selectedBibits={formData.selectedBibits}
+            jenisBibit={jenisBibit}
             paymentMethod={formData.paymentMethod}
             onChange={onChange}
           />
