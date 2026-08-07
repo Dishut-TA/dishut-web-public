@@ -4,7 +4,7 @@ import { type DonationFormData, type SelectedBibit } from "./DonationStepper";
 import { ToastError } from "@/utils/toast";
 
 interface DonationAmountStepProps {
-  jenisBibit: any[]; // <-- Menerima jenis bibit spesifik dari program
+  jenisBibit: any[]; 
   selectedBibits: SelectedBibit[];
   paymentMethod: string;
   onChange: (field: keyof DonationFormData, value: any) => void;
@@ -47,17 +47,22 @@ const DonationAmountStep: React.FC<DonationAmountStepProps> = ({
   const [isOpenPayment, setIsOpenPayment] = useState(false);
   const paymentWrapperRef = useRef<HTMLDivElement | null>(null);
 
-  // Mapping data jenis_bibit yang didapat dari detail program
   const bibitOptions: BibitOption[] = useMemo(() => {
-    return jenisBibit.map((item: any) => ({
-      id: item.id.toString(),
-      label: item.nama || item.name,
-      tinggi: "30-60 cm", // Bisa disesuaikan jika API mengirim data tinggi/spesifikasi
-      price: item.price ? Number(item.price) : 15000, 
-      stock: item.stock ?? 100, 
-    }));
-  }, [jenisBibit]);
+    return jenisBibit.map((item: any) => {
+      // Ambil spesifikasi pertama (atau sesuaikan jika ada banyak spesifikasi)
+      const spec = item.specifications && item.specifications.length > 0 
+        ? item.specifications[0] 
+        : null;
 
+      return {
+        id: item.id.toString(),
+        label: item.nama || item.name,
+        tinggi: spec ? `${spec.min_height}-${spec.max_height} cm` : "30-60 cm", 
+        price: spec ? Number(spec.price) : 0, // 👈 Mengambil harga asli dari database
+        stock: spec ? Number(spec.stock) : 0, // 👈 Mengambil stok asli dari database
+      };
+    });
+  }, [jenisBibit]);
   const totalPembayaran = useMemo(
     () => selectedBibits.reduce((acc, curr) => acc + curr.price * curr.quantity, 0),
     [selectedBibits]
