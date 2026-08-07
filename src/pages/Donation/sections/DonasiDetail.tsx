@@ -5,7 +5,7 @@ import AllocationTable, { type AllocationItem } from "../components/AllocationTa
 import DonorList from "../components/DonorList";
 import ProgramSummaryCard from "../components/ProgramSummaryCard";
 import { getDonationProgramByIdAPI } from "@/services/program-donasi.service";
-import { getDonorsAPI } from "@/services/donor.service"; // Service donatur baru
+import { getDonorsAPI } from "@/services/donor.service"; 
 
 const mockAllocations = [
   {
@@ -28,11 +28,11 @@ const DonasiDetail: React.FC = () => {
     const fetchData = async () => {
       try {
         if (!id) return;
-        // Ambil detail program dan data donatur secara paralel
         const [programRes, donorsRes] = await Promise.all([
           getDonationProgramByIdAPI(id),
-          getDonorsAPI().catch(() => ({ payload: [] })) // Fallback jika gagal
+          getDonorsAPI().catch(() => ({ payload: [] })) 
         ]);
+        console.log('data: ', programRes)
 
         setProgram(programRes.payload);
         
