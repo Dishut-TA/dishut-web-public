@@ -20,7 +20,7 @@ export interface DonationFormData {
   selectedBibits: SelectedBibit[];
   paymentMethod: string;
   virtualAccount: string;
-  proofFile: File | null;
+  proof_file: File | null;
 }
 
 interface DonationStepperProps {
@@ -85,7 +85,7 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
             amount={formData.amount}
             paymentMethod={formData.paymentMethod}
             virtualAccount={formData.virtualAccount}
-            proofFile={formData.proofFile}
+            proof_file={formData.proof_file}
             onChange={onChange}
           />
         )}
@@ -137,7 +137,7 @@ const DonationStepper: React.FC<DonationStepperProps> = ({
                 size="md"
                 className={`w-full ${isSubmitting ? 'bg-gray-400 cursor-not-allowed border-none' : ''}`}
                 onClick={onCheckStatus}
-                disabled={!formData.proofFile || isSubmitting}
+                disabled={!formData.proof_file || isSubmitting}
               />
             </>
           )}

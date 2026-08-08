@@ -10,8 +10,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ToastError, ToastSuccess } from "@/utils/toast";
 import { useAuth } from "@/context/AuthContext";
 import {
-  createDonationAPI,
-  createDonorAPI,
   createTransactionAPI,
 } from "@/services/donation.service";
 
@@ -54,7 +52,7 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
     selectedBibits: [],
     paymentMethod: "",
     virtualAccount: "",
-    proofFile: null,
+    proof_file: null,
   });
 
   const handleChange = (field: keyof DonationFormData, value: any) => {
@@ -97,56 +95,45 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
   };
 
   const handleSubmitDonasi = async () => {
-    if (!formData.proofFile) {
-      ToastError("Harap unggah bukti pembayaran terlebih dahulu.");
-      return;
-    }
+  if (!formData.proof_file) {
+    ToastError("Harap unggah bukti pembayaran terlebih dahulu.");
+    return;
+  }
 
-    setIsSubmitting(true);
-    try {
-      const donorPayload = {
-        user_id: user?.id || null,
-        donor_name: formData.name,
-        address: formData.address || "Tidak diketahui",
-      };
-      
-      const resDonor = await createDonorAPI(donorPayload);
-      const donorId = resDonor.payload.id;
+  setIsSubmitting(true);
 
-      let firstDonationId = null;
-      for (const bibit of formData.selectedBibits) {
-        const donationPayload = {
-          donation_program_id: programId,
-          donor_id: donorId,
-          seed_id: Number(bibit.id),
-          seed_quantity: bibit.quantity,
-          seed_status: "Pending",
-        };
-        const resDonation = await createDonationAPI(donationPayload);
-        if (!firstDonationId) firstDonationId = resDonation.payload.id;
-      }
+  try {
+    const submitData = new FormData();
+    submitData.append("user_id", user?.id ? user.id.toString() : "");
+    submitData.append("program_id", programId.toString());
+    submitData.append("donor_name", formData.name);
+    submitData.append(
+      "address",
+      formData.address || "Tidak diketahui"
+    );
+    submitData.append("amount", formData.amount);
+    submitData.append("payment_method", formData.paymentMethod);
+    submitData.append(
+      "selected_bibits",
+      JSON.stringify(formData.selectedBibits)
+    );
+    submitData.append("proof_file", formData.proof_file);
 
-      const now = new Date();
-      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+    await createTransactionAPI(submitData);
 
-      const transactionPayload = {
-        donation_id: firstDonationId,
-        donor_id: donorId,
-        amount: Number(formData.amount),
-        transaction_date: formattedDate,
-        payment_method: formData.paymentMethod,
-        status: "Pending",
-      };
-      await createTransactionAPI(transactionPayload);
+    ToastSuccess(
+      "Donasi berhasil dibuat! Menunggu konfirmasi admin."
+    );
 
-      ToastSuccess("Donasi berhasil dibuat! Menunggu konfirmasi admin.");
-      navigate("/donasi/riwayat-transaksi");
-    } catch (error: any) {
-      ToastError(error.message || "Terjadi kesalahan. Silakan coba lagi.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    navigate("/donasi/riwayat-transaksi");
+  } catch (error: any) {
+    ToastError(
+      error.message || "Terjadi kesalahan. Silakan coba lagi."
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const generateVirtualAccount = () => {
     return `${Math.floor(1000000000000000 + Math.random() * 9000000000000000)}`;

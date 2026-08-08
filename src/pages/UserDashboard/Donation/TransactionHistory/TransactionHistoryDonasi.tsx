@@ -28,17 +28,28 @@ const TransactionHistoryDonasi = () => {
         rawData = rawData.filter((item: any) => item.donor?.user_id === user.id);
       }
 
-      const mappedData: TransactionDonasiData[] = rawData.map((item: any) => ({
-        id: item.id.toString(),
-        tanggal: item.transaction_date ? item.transaction_date.split(' ')[0] : '-',
-        lahanProgram: item.donation?.donation_program?.name || '-',
-        jenisBibit: item.donation?.seed?.nama || '-',
-        jumlah: item.donation?.seed_quantity || 0,
-        amount: Number(item.amount) || 0,
-        userName: item.donor?.donor_name || 'Hamba Allah',
-        paymentMethod: item.payment_method || '-',
-        status: item.status || 'Pending',
-      }));
+      const mappedData: TransactionDonasiData[] = rawData.map((item: any) => {
+        // 1. Ambil nama program dari donasi urutan pertama (karena 1 transaksi = 1 program)
+        const programName = item.donations?.[0]?.donation_program?.name || '-';
+
+        // 2. Gabungkan semua jenis bibit yang dibeli menggunakan koma
+        const seedNames = item.donations?.map((d: any) => d.seed?.nama).join(', ') || '-';
+
+        // 3. Totalkan semua jumlah bibit dalam 1 transaksi
+        const totalQuantity = item.donations?.reduce((sum: number, d: any) => sum + d.seed_quantity, 0) || 0;
+
+        return {
+          id: item.id.toString(),
+          tanggal: item.transaction_date ? item.transaction_date.split(' ')[0] : '-',
+          lahanProgram: programName,
+          jenisBibit: seedNames,
+          jumlah: totalQuantity,
+          amount: Number(item.amount) || 0,
+          userName: item.donor?.donor_name || 'Hamba Allah',
+          paymentMethod: item.payment_method || '-',
+          status: item.status || 'Pending',
+        };
+      });
 
       setTransactions(mappedData);
     } catch (error: any) {

@@ -6,7 +6,7 @@ interface DonationPaymentStepProps {
   amount: string;
   paymentMethod: string;
   virtualAccount: string;
-  proofFile: File | null;
+  proof_file: File | null;
   onChange: (field: keyof DonationFormData, value: any) => void;
 }
 
@@ -20,7 +20,7 @@ const DonationPaymentStep: React.FC<DonationPaymentStepProps> = ({
   amount,
   paymentMethod,
   virtualAccount,
-  proofFile,
+  proof_file,
   onChange,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,7 +37,7 @@ const DonationPaymentStep: React.FC<DonationPaymentStepProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      onChange("proofFile", e.target.files[0]);
+      onChange("proof_file", e.target.files[0]);
     }
   };
 
@@ -93,14 +93,14 @@ const DonationPaymentStep: React.FC<DonationPaymentStepProps> = ({
           />
         </div>
 
-        {proofFile && (
+        {proof_file && (
           <div className="mt-3 p-3 bg-[#DCECE0] rounded-xl flex items-center justify-between text-sm">
             <span className="text-[#2E7D32] font-medium truncate w-3/4">
-              {proofFile.name}
+              {proof_file.name}
             </span>
             <button 
               type="button"
-              onClick={() => onChange("proofFile", null)}
+              onClick={() => onChange("proof_file", null)}
               className="text-red-500 hover:underline text-xs font-semibold"
             >
               Hapus

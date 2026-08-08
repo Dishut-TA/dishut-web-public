@@ -29,18 +29,27 @@ export const createDonationAPI = async (payload: any) => {
   return await res.json();
 };
 
-export const createTransactionAPI = async (payload: any) => {
-  const token = localStorage.getItem('token');
+export const createTransactionAPI = async (payload: FormData) => {
+  const token = localStorage.getItem("token");
+
   const res = await fetch(`${API_URL}/transactions`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` })
+      "Accept": "application/json",
+      ...(token && {
+        Authorization: `Bearer ${token}`,
+      }),
     },
-    body: JSON.stringify(payload)
+    body: payload,
   });
-  if (!res.ok) throw new Error("Gagal membuat transaksi pembayaran.");
-  return await res.json();
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error(result.message || "Gagal membuat transaksi pembayaran.");
+  }
+
+  return result;
 };
 
 export const getDonationsAPI = async () => {
@@ -72,5 +81,23 @@ export const updateDonationStatusAPI = async (id: number | string, status: strin
       throw new Error(errorData.message || "Gagal memperbarui status donasi.");
   }
   
+  return await res.json();
+};
+
+export const checkoutDonationAPI = async (formData: FormData) => {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${API_URL}/checkout`, {
+    method: 'POST',
+    headers: {
+      // browser akan otomatis menyesuaikan boundary multipart-nya.
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
+    body: formData
+  });
+  
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Gagal melakukan checkout donasi.");
+  }
   return await res.json();
 };

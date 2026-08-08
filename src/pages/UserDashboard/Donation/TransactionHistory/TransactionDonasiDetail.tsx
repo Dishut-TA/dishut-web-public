@@ -63,21 +63,28 @@ const TransactionDonasiDetail: React.FC = () => {
         const response = await getTransactionByIdAPI(id);
         const item = response.payload;
 
+        const namaProgram = item.donations?.[0]?.donation_program?.name || '-';
+        const lahanProgram = item.donations?.[0]?.donation_program?.location || '-';
+        const seedNames = item.donations?.map((d: any) => d.seed?.nama).join(', ') || '-';
+        const totalQuantity = item.donations?.reduce((sum: number, d: any) => sum + d.seed_quantity, 0) || 0;
+        const currentSeedStatus = item.donations?.[0]?.seed_status || 'Menunggu Verifikasi';
+        const programImage = item.donations?.[0]?.donation_program?.image_url || null;
+
         const mappedData: TransactionDonasiData = {
           id: item.id.toString(),
           tanggal: item.transaction_date || '-',
-          lahanProgram: item.donation?.donation_program?.location || '-',
-          namaProgram: item.donation?.donation_program?.name || '-',
-          jenisBibit: item.donation?.seed?.nama || '-',
-          jumlah: item.donation?.seed_quantity || 0,
+          namaProgram: namaProgram,
+          lahanProgram: lahanProgram,
+          jenisBibit: seedNames,
+          jumlah: totalQuantity,
           amount: Number(item.amount) || 0,
           userName: item.donor?.donor_name || 'Hamba Allah',
           paymentMethod: item.payment_method || '-',
-          status: item.status || 'Pending',
-          seedStatus: item.donation?.seed_status || 'Menunggu Verifikasi', 
+          status: item.status || 'Pending', 
+          seedStatus: currentSeedStatus, 
           lat: '-7.2345',
           long: '107.6541',
-          fotoRealisasi: item.donation?.donation_program?.image_url || null, 
+          fotoRealisasi: programImage, 
         };
 
         setData(mappedData);
