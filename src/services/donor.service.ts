@@ -1,5 +1,5 @@
-const API_URL = import.meta.env.VITE_API_EXAMPLE;
-// const API_URL = import.meta.env.VITE_API_MASTER_URL 
+// const API_URL = import.meta.env.VITE_API_EXAMPLE;
+const API_URL = import.meta.env.VITE_API_MASTER_URL 
 
 export const getDonorsAPI = async () => {
   try {
