@@ -1,5 +1,5 @@
-// const API_URL = import.meta.env.VITE_API_MASTER_URL || import.meta.env.VITE_API_EXAMPLE;
-const API_URL = import.meta.env.VITE_API_EXAMPLE;
+const API_URL = import.meta.env.VITE_API_MASTER_URL || import.meta.env.VITE_API_EXAMPLE;
+// const API_URL = import.meta.env.VITE_API_EXAMPLE;
 
 export const getTransactionsAPI = async () => {
   try {
