@@ -25,7 +25,6 @@ const StatsSection = () => {
     const fetchPrograms = async () => {
       try {
         const response = await getDonationProgramsAPI();
-        // Hanya tampilkan program yang Aktif, dan batasi 3 item saja untuk Beranda
         const activePrograms = response.payload
           .filter((p: any) => p.status.toLowerCase() === 'active' || p.status.toLowerCase() === 'aktif')
           .slice(0, 3);
@@ -86,9 +85,8 @@ const StatsSection = () => {
                   id={item.id}
                   title={item.name}
                   location={item.location}
-                  // Menggunakan placeholder jika backend belum punya field ini
                   description={item.description || "Bantu kami merehabilitasi hutan dan lahan kritis melalui program penanaman pohon untuk menjaga kelestarian lingkungan."}
-                  image={item.image || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"}
+                  image={item.image_url || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"}
                   collected={item.total_seeds_collected.toString()}
                   status="Aktif" 
                   onClick={() => navigate(`/donasi/detail/${item.id}`)} 
