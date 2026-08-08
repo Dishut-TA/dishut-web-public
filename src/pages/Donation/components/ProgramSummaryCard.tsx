@@ -105,10 +105,11 @@ const ProgramSummaryCard: React.FC<ProgramSummaryCardProps> = ({
     setIsSubmitting(true);
     try {
       const donorPayload = {
-        user_id: null,
+        user_id: user?.id || null,
         donor_name: formData.name,
         address: formData.address || "Tidak diketahui",
       };
+      
       const resDonor = await createDonorAPI(donorPayload);
       const donorId = resDonor.payload.id;
 

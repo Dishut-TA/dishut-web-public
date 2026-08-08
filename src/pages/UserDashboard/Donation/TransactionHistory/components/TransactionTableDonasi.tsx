@@ -11,11 +11,24 @@ const TransactionTableDonasi: React.FC<TransactionTableDonasiProps> = ({ data })
   const navigate = useNavigate(); 
 
   const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'Terealisasi': return 'text-primary';
-      case 'Terkumpul': return 'text-secondary';
-      case 'Disalurkan': return 'text-tertiary';
-      default: return 'text-primary'; 
+    switch(status.toLowerCase()) {
+      case 'terealisasi': 
+      case 'success':
+      case 'berhasil': 
+        return 'text-primary bg-primary/10';
+      case 'terkumpul': 
+        return 'text-secondary bg-secondary/10';
+      case 'disalurkan': 
+        return 'text-tertiary bg-tertiary/10';
+      case 'pending': 
+      case 'menunggu verifikasi': 
+        return 'text-amber-600 bg-amber-50';
+      case 'gagal': 
+      case 'failed': 
+      case 'ditolak': 
+        return 'text-red-600 bg-red-50';
+      default: 
+        return 'text-primary bg-gray-100'; 
     }
   }
 
@@ -36,7 +49,7 @@ const TransactionTableDonasi: React.FC<TransactionTableDonasiProps> = ({ data })
         <tbody>
           {data.map((item, index) => (
             <tr key={index} className="border-b border-gray-100/70 transition-colors duration-200 text-sm font-semibold text-primary/90 hover:bg-gray-50/50">
-              <td className="py-5 px-6 text-gray-500">{item.id}</td>
+              <td className="py-5 px-6 text-gray-500">TRX-{item.id.padStart(3, '0')}</td>
               <td className="py-5 px-6 text-gray-500">{item.tanggal}</td>
               <td className="py-5 px-6 font-bold">{item.lahanProgram}</td>
               <td className="py-5 px-6 text-gray-500">{item.jenisBibit}</td>

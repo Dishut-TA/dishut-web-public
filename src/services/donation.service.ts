@@ -42,3 +42,35 @@ export const createTransactionAPI = async (payload: any) => {
   if (!res.ok) throw new Error("Gagal membuat transaksi pembayaran.");
   return await res.json();
 };
+
+export const getDonationsAPI = async () => {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${API_URL}/donations`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    }
+  });
+  if (!res.ok) throw new Error("Gagal mengambil data donasi.");
+  return await res.json();
+};
+
+export const updateDonationStatusAPI = async (id: number | string, status: string) => {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${API_URL}/donations/${id}`, {
+    method: 'PUT', 
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
+    body: JSON.stringify({ seed_status: status }) 
+  });
+  
+  if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Gagal memperbarui status donasi.");
+  }
+  
+  return await res.json();
+};

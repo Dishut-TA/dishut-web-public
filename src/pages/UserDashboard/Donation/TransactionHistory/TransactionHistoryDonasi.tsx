@@ -1,45 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HiSearch } from 'react-icons/hi';
+import toast from 'react-hot-toast';
 import TransactionTableDonasi from './components/TransactionTableDonasi';
 import EmptyState from '../../../../components/EmptyState';
 import type { TransactionDonasiData } from '@/utils/interface';
-
-export const mockDonasiList: TransactionDonasiData[] = [
-  {
-    id: 'TRX-101',
-    tanggal: '2026-05-10',
-    lahanProgram: 'Penghijauan Hulu Citarum',
-    jenisBibit: 'Mahoni',
-    jumlah: 50,
-    amount: 750000,
-    userName: 'Raisha Nabila',
-    userPhone: '0895320343049',
-    userEmail: 'raisha@gmail.com',
-    paymentMethod: 'Bank Central Asia (BCA)',
-    status: 'Terealisasi',
-    lat: '-7.2345',
-    long: '107.6541',
-    fotoRealisasi: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 'TRX-105',
-    tanggal: '2026-05-18',
-    lahanProgram: 'Penghijauan Hulu Citarum',
-    jenisBibit: 'Mahoni',
-    jumlah: 35,
-    amount: 525000,
-    userName: 'Raisha Nabila',
-    userPhone: '0895320343049',
-    userEmail: 'raisha@gmail.com',
-    paymentMethod: 'Bank Mandiri',
-    status: 'Terkumpul',
-  }
-];
+import { getTransactionsAPI } from '@/services/transaction.service';
+import { useAuth } from '@/context/AuthContext'; 
 
 const TransactionHistoryDonasi = () => {
+  const { user } = useAuth(); 
   const [searchQuery, setSearchQuery] = useState('');
+  const [transactions, setTransactions] = useState<TransactionDonasiData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredData = mockDonasiList.filter((item) =>
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getTransactionsAPI();
+      
+      let rawData = Array.isArray(response.payload) ? response.payload : [];
+
+      if (user && user.id) {
+        rawData = rawData.filter((item: any) => item.donor?.user_id === user.id);
+      }
+
+      const mappedData: TransactionDonasiData[] = rawData.map((item: any) => ({
+        id: item.id.toString(),
+        tanggal: item.transaction_date ? item.transaction_date.split(' ')[0] : '-',
+        lahanProgram: item.donation?.donation_program?.name || '-',
+        jenisBibit: item.donation?.seed?.nama || '-',
+        jumlah: item.donation?.seed_quantity || 0,
+        amount: Number(item.amount) || 0,
+        userName: item.donor?.donor_name || 'Hamba Allah',
+        paymentMethod: item.payment_method || '-',
+        status: item.status || 'Pending',
+      }));
+
+      setTransactions(mappedData);
+    } catch (error: any) {
+      toast.error(error.message || "Gagal memuat data riwayat transaksi");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredData = transactions.filter((item) =>
     item.lahanProgram.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -52,7 +61,9 @@ const TransactionHistoryDonasi = () => {
           <div className="relative w-full md:w-72">
             <HiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={20} />
             <input 
-              type="text" placeholder="Search" value={searchQuery}
+              type="text" 
+              placeholder="Cari lahan atau ID..." 
+              value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 rounded-full border border-primary bg-transparent focus:outline-none focus:border-primary transition-all text-sm font-medium"
             />
@@ -60,7 +71,12 @@ const TransactionHistoryDonasi = () => {
         </div>
 
         <div className="w-full">
-          {filteredData.length > 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <span className="w-8 h-8 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></span>
+              <p className="text-sm font-bold text-gray-500 mt-4">Memuat riwayat transaksi...</p>
+            </div>
+          ) : filteredData.length > 0 ? (
             <TransactionTableDonasi data={filteredData} />
           ) : (
             <EmptyState type="donasi" />

@@ -30,17 +30,19 @@ export interface TransactionDonasiData {
   id: string;
   tanggal: string;
   lahanProgram: string;
+  namaProgram: string;
   jenisBibit: string;
   jumlah: number;
   amount: number;
   userName: string;
-  userPhone: string;
-  userEmail: string;
+  userPhone?: string;
+  userEmail?: string;
   paymentMethod: string;
-  status: 'Menunggu Verifikasi' | 'Terkumpul' | 'Disalurkan' | 'Terealisasi';
+  status: string;
+  seedStatus?: string; 
   lat?: string;
   long?: string;
-  fotoRealisasi?: string;
+  fotoRealisasi?: string | null;
 }
 
 export interface TransactionData {
