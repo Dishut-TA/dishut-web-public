@@ -1,13 +1,10 @@
 import React from "react";
-import { MdLocationOn } from "react-icons/md";
 import { useNavigate } from "react-router-dom"; 
 import Button from "@/components/Button";
 
 export interface InvestmentProgram {
-  id: number;
-  scheme: string;
+  id: string | number;
   image: string;
-  location: string;
   title: string;
   description: string;
   collected: number;
@@ -26,7 +23,7 @@ interface InvestmentCardProps {
 }
 
 const InvestmentCard: React.FC<InvestmentCardProps> = ({ program }) => {
-  const navigate = useNavigate(); // 2. Inisialisasi navigate
+  const navigate = useNavigate(); 
   const progress = Math.min((program.collected / program.target) * 100, 100);
 
   return (
@@ -37,16 +34,9 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ program }) => {
           alt={program.title}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-md text-xs font-semibold text-gray-800 shadow-sm">
-          {program.scheme}
-        </div>
       </div>
       <div className="p-5 md:p-6 flex flex-col grow">
-        <div className="flex items-center gap-1.5 text-sm font-medium text-[#4F6352] mb-3">
-          <MdLocationOn className="text-lg" />
-          <span>{program.location}</span>
-        </div>
-        <h3 className="text-lg md:text-xl font-bold text-primary leading-tight mb-3">
+        <h3 className="text-lg md:text-xl font-bold text-primary leading-tight mb-3 line-clamp-2">
           {program.title}
         </h3>
         <p className="text-sm text-[#4F6352] leading-relaxed mb-6 line-clamp-3">
@@ -85,7 +75,7 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ program }) => {
           <Button 
             label="Investasi Sekarang" 
             size="lg" 
-            className="w-full"
+            className="w-full cursor-pointer"
             onClick={() => navigate(`/investasi/detail/${program.id}`)} 
           />
         </div>
