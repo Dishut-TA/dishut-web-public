@@ -1,14 +1,39 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FiChevronLeft } from 'react-icons/fi';
 import StepperBar from './components/stepper/StepperBar';
 import Step1Info from './components/stepper/Step1Info';
 import Step2Milestone from './components/stepper/Step2Milestone';
 import Step3Dokumen from './components/stepper/Step3Dokumen';
+import { getProgramByIdAPI } from '@/services/invest.service';
+import { ToastError } from '@/utils/toast';
 
 const DetailInvestasi: React.FC = () => {
+  const { id } = useParams();
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+  const [program, setProgram] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      getProgramByIdAPI(id)
+        .then(res => setProgram(res))
+        .catch(err => {
+          console.error(err);
+          ToastError("Gagal memuat detail investasi");
+        })
+        .finally(() => setIsLoading(false));
+    }
+  }, [id]);
+
+  if (isLoading) {
+    return <div className="min-h-screen flex justify-center items-center">Loading...</div>;
+  }
+
+  if (!program) {
+    return <div className="min-h-screen flex justify-center items-center">Data tidak ditemukan</div>;
+  }
 
   return (
     <div className="min-h-screen">
@@ -22,14 +47,14 @@ const DetailInvestasi: React.FC = () => {
         </button>
 
         <h1 className="text-2xl font-bold text-primary text-center mb-6">
-          Pembangunan Ekowisata Pinus
+          {program.nama_program}
         </h1>
 
         <StepperBar currentStep={step} />
 
-        {step === 1 && <Step1Info onNext={() => setStep(2)} />}
-        {step === 2 && <Step2Milestone onNext={() => setStep(3)} />}
-        {step === 3 && <Step3Dokumen onFinish={() => navigate(-1)} />}
+        {step === 1 && <Step1Info onNext={() => setStep(2)} program={program} />}
+        {step === 2 && <Step2Milestone onNext={() => setStep(3)} program={program} />}
+        {step === 3 && <Step3Dokumen onFinish={() => navigate(-1)} program={program} />}
 
       </div>
     </div>

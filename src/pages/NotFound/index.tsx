@@ -28,7 +28,7 @@ const NotFound = () => {
         </h1>
         
         <p className="text-gray-500 text-sm md:text-base mb-8 md:px-12 leading-relaxed">
-          Jalan yang kamu cari tidak ditemukan di peta kami atau mungkin <span className='font-bold text-black'>Al-Giffari yang JAGO BANGET itu lagi kelelahan, jadi belum diberesin fiturnya.</span> Mungkin halamannya sedang direboisasi atau pindah ke ujung hutan lain. Yuk, kembali ke jalan yang benar!
+          Jalan yang kamu cari tidak ditemukan di peta kami atau mungkin halamannya sedang direboisasi atau pindah ke ujung hutan lain. Yuk, kembali ke jalan yang benar!
         </p>
 
         <div className="group">

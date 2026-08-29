@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HiSearch } from 'react-icons/hi';
 import { FiChevronRight } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import PaymentModal from './components/PaymentModal'; // Pastikan path import sesuai
+import { useAuth } from '@/context/AuthContext';
+import { getRiwayatTransaksiAPI } from '@/services/invest.service';
+import { ToastError } from '@/utils/toast';
 
 interface VerifikasiData {
   id: string;
@@ -12,32 +15,47 @@ interface VerifikasiData {
   amount: number;
 }
 
-const mockVerifikasiData: VerifikasiData[] = [
-  {
-    id: '72456', 
-    item: 'Ekowisata Camp Pinus Cikole',
-    date: '20/01/2024',
-    status: 'Menunggu Pembayaran',
-    amount: 10000000,
-  },
-  {
-    id: '72457',
-    item: 'Ekowisata Kebun Stroberi',
-    date: '06/03/2024',
-    status: 'Terverifikasi',
-    amount: 10000000,
-  }
-];
-
 const VerifikasiInvestasi: React.FC = () => {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const [transactions, setTransactions] = useState<VerifikasiData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // State untuk mengontrol Modal Pembayaran
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<VerifikasiData | null>(null);
 
-  const filteredData = mockVerifikasiData.filter((data) =>
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const token = (user as any)?.token || localStorage.getItem('token') || '';
+        const userId = (user as any)?.id || '';
+        if (!userId) return;
+
+        const data = await getRiwayatTransaksiAPI(token, userId);
+        
+        const mappedData: VerifikasiData[] = data.map((trx: any) => ({
+          id: String(trx.id || trx.id_transaksi || Math.random().toString(36).substr(2, 6)),
+          item: trx.nama_program_investasi || trx.program?.nama_program_investasi || trx.program?.nama_program || 'Program Investasi',
+          date: new Date(trx.tanggal_bayar || trx.created_at || Date.now()).toLocaleDateString('id-ID'),
+          status: trx.status_pembayaran === 'PENDING' ? 'Menunggu Pembayaran' : 'Terverifikasi',
+          amount: parseFloat(trx.total_nominal_pembayaran || trx.nominal_pendanaan || 0),
+        }));
+
+        setTransactions(mappedData);
+      } catch (error) {
+        console.error(error);
+        ToastError('Gagal memuat data verifikasi');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [user]);
+
+  const filteredData = transactions.filter((data) =>
     data.item.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -86,7 +104,13 @@ const VerifikasiInvestasi: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredData.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-gray-400 font-medium text-sm">
+                    Loading...
+                  </td>
+                </tr>
+              ) : filteredData.length > 0 ? (
                 filteredData.map((data, index) => (
                   <tr 
                     key={index} 

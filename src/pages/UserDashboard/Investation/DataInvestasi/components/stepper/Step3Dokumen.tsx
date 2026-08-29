@@ -2,28 +2,24 @@ import React from 'react';
 
 interface Step3Props {
   onFinish: () => void;
+  program: any;
 }
 
-const documents = [
-  { label: 'Dokumen Perjanjian Investasi', file: 'PerjanjianInvestasi.pdf' },
-  { label: 'Dokumen Rencana Bisnis', file: 'RencanaProyekPembangunanWisataDiving.pdf' },
-  { label: 'Template Perjanjian Investor', file: 'DokumenPerjanjian.pdf' },
-];
-
-const Step3Dokumen: React.FC<Step3Props> = ({ onFinish }) => {
+const Step3Dokumen: React.FC<Step3Props> = ({ onFinish, program }) => {
+  const documents = program?.dokumens || [];
   return (
     <div className="animate-[fadeIn_0.3s_ease-out]">
       <h3 className="text-center font-bold text-primary mb-8">Dokumen Pendukung</h3>
       <div className="space-y-4 mb-10">
-        {documents.map((doc, index) => (
+        {documents.length > 0 ? documents.map((doc: any, index: number) => (
           <div key={index} className="flex text-sm">
-            <span className="w-56 font-medium text-primary">{doc.label}</span>
+            <span className="w-56 font-medium text-primary">{doc.tipe_dokumen}</span>
             <span className="font-bold text-primary mr-2">:</span>
-            <span className="text-primary hover:text-tertiary underline cursor-pointer truncate font-medium">
-              {doc.file}
-            </span>
+            <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-tertiary underline cursor-pointer truncate font-medium">
+              Lihat Dokumen
+            </a>
           </div>
-        ))}
+        )) : <div className="text-center text-gray-400 py-10">Belum ada dokumen</div>}
       </div>
 
       <button 
