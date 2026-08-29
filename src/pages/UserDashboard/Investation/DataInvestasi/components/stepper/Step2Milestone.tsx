@@ -4,49 +4,32 @@ import { HiOutlineDocumentReport } from 'react-icons/hi';
 interface Step2Props {
   onNext: () => void;
   onBack?: () => void; 
+  program: any;
 }
 
-const milestones = [
-  {
-    id: 1,
-    nama: 'Milestone 1',
-    batas: '22/04/2024',
-    status: 'Belum Dimulai',
-    doc: '-',
-    deskripsi: 'Lorem ipsum dolor sit amet consectetur. Faucibus faucibus urna nulla amet at nascetur. Enim aliquam sed nibh bibendum.'
-  },
-  {
-    id: 2,
-    nama: 'Milestone 2',
-    batas: '22/04/2024',
-    status: 'Belum Dimulai',
-    doc: '-',
-    deskripsi: 'Lorem ipsum dolor sit amet consectetur. Faucibus faucibus urna nulla amet at nascetur. Enim aliquam sed nibh bibendum.'
-  }
-];
-
-const Step2Milestone: React.FC<Step2Props> = ({ onNext }) => {
+const Step2Milestone: React.FC<Step2Props> = ({ onNext, program }) => {
+  const milestones = program?.milestones || [];
   return (
     <div className="animate-[fadeIn_0.3s_ease-out]">
       <div className="space-y-8">
-        {milestones.map((ms) => (
+        {milestones.length > 0 ? milestones.map((ms: any) => (
           <div key={ms.id} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
             <div className="space-y-3 text-sm text-primary">
               <div className="flex">
                 <span className="w-40 font-medium">Nama Milestone</span> 
-                <span className="font-bold">: {ms.nama}</span>
+                <span className="font-bold">: {ms.judul_milestone}</span>
               </div>
               <div className="flex">
                 <span className="w-40 font-medium">Batas Milestone</span> 
-                <span className="font-medium">: {ms.batas}</span>
+                <span className="font-medium">: {new Date(ms.target_tanggal).toLocaleDateString('id-ID')}</span>
               </div>
               <div className="flex items-center">
                 <span className="w-40 font-medium">Status</span> 
-                <span className="font-medium flex items-center gap-2">: {ms.status} <HiOutlineDocumentReport size={20} /></span>
+                <span className="font-medium flex items-center gap-2">: {ms.status || 'Belum Dimulai'} <HiOutlineDocumentReport size={20} /></span>
               </div>
               <div className="flex">
                 <span className="w-40 font-medium">Dokumen Milestone</span> 
-                <span className="font-medium">: {ms.doc}</span>
+                <span className="font-medium">: {ms.doc || '-'}</span>
               </div>
               <div className="flex flex-col pt-2">
                 <span className="font-medium mb-1">Deskripsi</span>
@@ -56,7 +39,7 @@ const Step2Milestone: React.FC<Step2Props> = ({ onNext }) => {
               </div>
             </div>
           </div>
-        ))}
+        )) : <div className="text-center text-gray-400 py-10">Belum ada milestone</div>}
       </div>
 
       <div className="mt-8">

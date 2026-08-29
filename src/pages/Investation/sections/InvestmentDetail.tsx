@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; 
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom"; 
 import { useAuth } from "@/context/AuthContext"; 
 import { FiChevronLeft, FiChevronRight, FiShare2 } from "react-icons/fi";
 import { HiOutlineUserGroup, HiOutlineCalendar, HiOutlineChartPie } from "react-icons/hi2";
@@ -11,10 +11,10 @@ import Step1Identity from "../components/stepper/Step1Identity";
 import Step2Investment from "../components/stepper/Step2Investment";
 import Step3Payment from "../components/stepper/Step3Payment";
 import Step4Success from "../components/stepper/Step4Success";
-import TabDetail from "../components/TabDetail";
 import TabPanduan from "../components/TabPanduan";
 import TabDokumen from "../components/TabDokumen";
 import AgreementWarningModal from "../components/AgreementWarningModal";
+import { getProgramByIdAPI, postInvestasiAPI } from "@/services/invest.service";
 
 const cardTransition: Transition = { duration: 0.6, ease: [0.22, 1, 0.36, 1] };
 
@@ -24,9 +24,35 @@ const InvestmentDetail: React.FC = () => {
   const location = useLocation();
   const [isFlipped, setIsFlipped] = useState(false);
   const [step, setStep] = useState(1);
+  const [createdTransactionId, setCreatedTransactionId] = useState<string>('');
   const [hasDownloaded, setHasDownloaded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'detail' | 'panduan' | 'dokumen'>('detail');
+  const { id } = useParams();
+  const [program, setProgram] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [formData, setFormData] = useState({
+    program_id: id || "",
+    nominal_pendanaan: 500000,
+    metode_pembayaran: "",
+    nama: (user as any)?.name || (user as any)?.nama || "",
+    email: (user as any)?.email || "",
+    no_telp: (user as any)?.phone || (user as any)?.no_telp || "",
+    dokumen_url: ""
+  });
+
+  useEffect(() => {
+    if (id) {
+      getProgramByIdAPI(id)
+        .then(res => setProgram(res))
+        .catch(err => {
+          console.error(err);
+          ToastError("Gagal memuat detail investasi");
+        })
+        .finally(() => setIsLoading(false));
+    }
+  }, [id]);
 
   const handleInvestClick = () => {
     if (!user) {
@@ -52,6 +78,38 @@ const InvestmentDetail: React.FC = () => {
     ToastSuccess("Link tautan berhasil disalin ke clipboard!");
   };
 
+  const handleSubmitInvestment = async () => {
+    if (!formData.metode_pembayaran || !formData.nominal_pendanaan) {
+      ToastError("Harap lengkapi metode pembayaran dan nominal");
+      return;
+    }
+    try {
+      const token = (user as any)?.token || localStorage.getItem('token') || '';
+      const userId = (user as any)?.id || '';
+      const response = await postInvestasiAPI(formData, token, userId);
+      // Capture transaction ID from response if available
+      if (response && response.payload && response.payload.id) {
+        setCreatedTransactionId(response.payload.id);
+      }
+      ToastSuccess("Investasi berhasil diajukan!");
+      setStep(3); 
+    } catch (err: any) {
+      ToastError(err.message || "Gagal mengajukan investasi");
+    }
+  };
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-[#F5F7F5] pt-28 pb-12 flex justify-center items-center">Loading...</div>;
+  }
+
+  if (!program) {
+    return <div className="min-h-screen bg-[#F5F7F5] pt-28 pb-12 flex justify-center items-center">Data tidak ditemukan</div>;
+  }
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F7F5] pt-28 pb-12 px-5 md:px-8 lg:px-12 font-sans overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
@@ -66,8 +124,8 @@ const InvestmentDetail: React.FC = () => {
           <div className="lg:col-span-7 flex flex-col w-full order-2 lg:order-1">
             <div className="w-full aspect-16/10 sm:aspect-video rounded-3xl overflow-hidden shadow-md mb-4 bg-gray-200">
               <img 
-                src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1000&q=80" 
-                alt="Ekowisata Rimba Pinus" 
+                src={program.gambar || "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1000&q=80"} 
+                alt={program.nama_program} 
                 className="w-full h-full object-cover"
               />
             </div>
@@ -109,9 +167,17 @@ const InvestmentDetail: React.FC = () => {
             </div>
 
             <div className="min-h-37.5 pb-10 lg:pb-0">
-              {activeTab === 'detail' && <TabDetail />}
+              {activeTab === 'detail' && (
+                <div className="animate-[fadeIn_0.3s_ease-out]">
+                  <p className="text-[#4F6352] text-sm md:text-[15px] leading-relaxed whitespace-pre-line">
+                    {program.deskripsi}
+                  </p>
+                </div>
+              )}
               {activeTab === 'panduan' && <TabPanduan />}
-              {activeTab === 'dokumen' && <TabDokumen onDownloadTemplate={() => setHasDownloaded(true)} />}
+              {activeTab === 'dokumen' && (
+                <TabDokumen onDownloadTemplate={() => setHasDownloaded(true)} program={program} />
+              )}
             </div>
           </div>
 
@@ -127,38 +193,36 @@ const InvestmentDetail: React.FC = () => {
                     className="flex flex-col w-full origin-center"
                   >
                     <h1 className="text-2xl sm:text-3xl md:text-[36px] font-bold text-primary mb-3 md:mb-4 tracking-tight leading-tight">
-                      Ekowisata Rimba Pinus
+                      {program.nama_program}
                     </h1>
                     
-                    <p className="text-[#4F6352] text-sm md:text-[15px] leading-relaxed mb-6 md:mb-8">
-                      Lorem ipsum dolor sit amet consectetur. Sed arcu elementum eu feugiat 
-                      mattis posuere. Tempus quis consequat in amet. Commodo dignissim sed 
-                      tellus mi. Rhoncus lectus habitant leo urna et tortor nunc velit accumsan.
+                    <p className="text-[#4F6352] text-sm md:text-[15px] leading-relaxed mb-6 md:mb-8 line-clamp-3">
+                      {program.deskripsi}
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4 mb-6 md:mb-8 text-[#555555] text-xs sm:text-sm font-semibold">
-                      <div className="flex items-center gap-3"><TbTargetArrow className="text-xl shrink-0 text-primary" /> <span>Minimal Invest Rp 100.000</span></div>
-                      <div className="flex items-center gap-3"><HiOutlineUserGroup className="text-xl shrink-0 text-primary" /> <span>8 Orang Sudah Berinvestasi</span></div>
-                      <div className="flex items-center gap-3"><HiOutlineChartPie className="text-xl shrink-0 text-primary" /> <span>Presentase Keuntungan 60:40</span></div>
-                      <div className="flex items-center gap-3"><HiOutlineCalendar className="text-xl shrink-0 text-primary" /> <span>Dikelola Selama 48 Bulan</span></div>
+                      <div className="flex items-center gap-3"><TbTargetArrow className="text-xl shrink-0 text-primary" /> <span>Kategori {program.kategori_usaha}</span></div>
+                      <div className="flex items-center gap-3"><HiOutlineUserGroup className="text-xl shrink-0 text-primary" /> <span>Oleh {program.nama_kth || 'KTH'}</span></div>
+                      <div className="flex items-center gap-3"><HiOutlineChartPie className="text-xl shrink-0 text-primary" /> <span>Keuntungan {program.persentase_keuntungan}%</span></div>
+                      <div className="flex items-center gap-3"><HiOutlineCalendar className="text-xl shrink-0 text-primary" /> <span>Dikelola Selama {program.periode_kontrak_bulan} Bulan</span></div>
                     </div>
 
                     <div className="mb-6 md:mb-8">
                       <div className="flex justify-between items-center mb-2 font-bold text-sm text-gray-700">
                         <span>Target Terkumpul</span>
-                        <span className="text-primary text-base">90%</span>
+                        <span className="text-primary text-base">{program.persentase_terkumpul}%</span>
                       </div>
                       <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden mb-3">
-                        <div className="h-full bg-primary rounded-full" style={{ width: '90%' }}></div>
+                        <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(program.persentase_terkumpul, 100)}%` }}></div>
                       </div>
                       <div className="flex justify-between text-xs font-bold text-gray-400">
                         <div>
                           <p className="uppercase tracking-wider text-[10px] sm:text-[11px] mb-0.5">Terkumpul</p>
-                          <p className="text-primary text-sm sm:text-base font-bold">Rp 450.000.000</p>
+                          <p className="text-primary text-sm sm:text-base font-bold">{formatCurrency(program.dana_terkumpul)}</p>
                         </div>
                         <div className="text-right">
                           <p className="uppercase tracking-wider text-[10px] sm:text-[11px] mb-0.5">Dari Target</p>
-                          <p className="text-gray-600 text-sm sm:text-base font-bold">Rp 500.000.000</p>
+                          <p className="text-gray-600 text-sm sm:text-base font-bold">{formatCurrency(program.target_dana)}</p>
                         </div>
                       </div>
                     </div>
@@ -179,9 +243,9 @@ const InvestmentDetail: React.FC = () => {
 className="w-full bg-[#D5ECD8] rounded-3xl p-5 sm:p-6 md:p-8 origin-center shadow-md overflow-visible relative z-20"                  >
                     {step <= 3 && <StepperIndicator currentStep={step} />}
                     <div className="mt-2 md:mt-4">
-                      {step === 1 && <Step1Identity onNext={() => setStep(2)} />}
-                      {step === 2 && <Step2Investment onNext={() => setStep(3)} onBack={() => setStep(1)} />}
-                      {step === 3 && <Step3Payment onNext={() => setStep(4)} onBack={() => setStep(2)} />}
+                      {step === 1 && <Step1Identity onNext={() => setStep(2)} formData={formData} setFormData={setFormData} />}
+                      {step === 2 && <Step2Investment onNext={handleSubmitInvestment} onBack={() => setStep(1)} formData={formData} setFormData={setFormData} />}
+                      {step === 3 && <Step3Payment onNext={() => setStep(4)} onBack={() => setStep(2)} nominal={formData.nominal_pendanaan} transactionId={createdTransactionId} token={(user as any)?.token || localStorage.getItem('token')} />}
                       {step === 4 && <Step4Success />}
                     </div>
                   </motion.div>

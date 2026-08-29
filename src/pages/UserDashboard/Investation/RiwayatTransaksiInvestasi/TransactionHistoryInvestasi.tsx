@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HiSearch } from 'react-icons/hi';
+import { useAuth } from '@/context/AuthContext';
+import { getRiwayatTransaksiAPI } from '@/services/invest.service';
+import { ToastError } from '@/utils/toast';
 import TransactionTableInvestasi from './components/TransactionTableInvestasi';
 import EmptyState from '../../../../components/EmptyState';
 import type { TransactionData } from '@/utils/interface';
@@ -16,9 +19,46 @@ export const mockInvestasi: TransactionData[] = [
 ];
 
 const TransactionHistoryInvestasi = () => {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [transactions, setTransactions] = useState<TransactionData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredData = mockInvestasi.filter((item) =>
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const token = (user as any)?.token || localStorage.getItem('token') || '';
+        const userId = (user as any)?.id || '';
+        if (!userId) return;
+
+        const data = await getRiwayatTransaksiAPI(token, userId);
+        console.log(data)
+        
+        const mappedData: TransactionData[] = data.map((trx: any) => ({
+          id: `#${trx.id || trx.id_transaksi || Math.random().toString(36).substr(2, 6)}`,
+          activityName: trx.nama_program_investasi || trx.program?.nama_program_investasi || trx.program?.nama_program || 'Program Investasi',
+          date: new Date(trx.tanggal_bayar || trx.created_at || Date.now()).toLocaleDateString('id-ID'),
+          status: trx.status_pembayaran === 'PENDING' ? 'Menunggu Konfirmasi' : (trx.status_pembayaran === 'SUCCESS' || trx.status_pembayaran === 'PAID' ? 'Sudah Dibayar' : trx.status_pembayaran),
+          amount: parseFloat(trx.total_nominal_pembayaran || trx.nominal_pendanaan || 0),
+          userName: trx.nama_investor || trx.nama || '',
+          userPhone: trx.no_telp || '',
+          userEmail: trx.email || '',
+          paymentMethod: trx.metode_pembayaran || '-'
+        }));
+
+        setTransactions(mappedData);
+      } catch (error) {
+        console.error(error);
+        ToastError('Gagal memuat riwayat transaksi');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [user]);
+
+  const filteredData = transactions.filter((item) =>
     item.activityName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -37,7 +77,15 @@ const TransactionHistoryInvestasi = () => {
             />
           </div>
         </div>
-        <div className="w-full">{filteredData.length > 0 ? <TransactionTableInvestasi data={filteredData} /> : <EmptyState type="investasi" />}</div>
+        <div className="w-full">
+          {isLoading ? (
+            <div className="text-center py-10 text-gray-400">Loading...</div>
+          ) : filteredData.length > 0 ? (
+            <TransactionTableInvestasi data={filteredData} />
+          ) : (
+            <EmptyState type="investasi" />
+          )}
+        </div>
       </div>
     </div>
   );

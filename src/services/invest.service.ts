@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_EXAMPLE;
+const API_URL = import.meta.env.VITE_API_INVEST_URL;
 
 export const getPublicProgramsAPI = async () => {
   try {
@@ -21,3 +21,100 @@ export const getPublicProgramsAPI = async () => {
     throw error;
   }
 };
+
+export const getProgramByIdAPI = async (id: string) => {
+  try {
+    const response = await fetch(`${API_URL}/programs/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Gagal mengambil data program investasi.');
+    }
+
+    return result.payload;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const postInvestasiAPI = async (data: any, token: string, userId: string | number) => {
+  try {
+    const response = await fetch(`${API_URL}/investor/pendanaan`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-User-Id': String(userId)
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Gagal melakukan investasi.');
+    }
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getRiwayatTransaksiAPI = async (token: string, userId: string | number) => {
+  try {
+    const response = await fetch(`${API_URL}/investor/riwayat-transaksi`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-User-Id': String(userId)
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Gagal mengambil riwayat transaksi investasi.');
+    }
+
+    return result.payload.data || result.payload || [];
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const simulatePaymentWebhookAPI = async (transactionId: string) => {
+  try {
+    const response = await fetch(`${API_URL}/pendanaan/webhook`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      // Sesuai dengan payload yang dibaca oleh backend: $request->input('transaksi_id')
+      body: JSON.stringify({ transaksi_id: transactionId })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Gagal memproses webhook pembayaran.');
+    }
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+

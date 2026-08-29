@@ -9,6 +9,7 @@ import { AlertConfirm } from "@/utils/alert";
 import NotificationDropdown from "./NotificationDropdown";
 import ProfileDropdown from "./ProfileDropdown";
 import MobileMenu from "./MobileMenu";
+import LOGO from '@/assets/images/LogoSigapFull2.png'
 
 export const menus = [
   { label: "Beranda", path: "/" },
@@ -46,12 +47,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full z-5000 bg-customWhite/90 backdrop-blur-md transition-all duration-300 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between relative">
-        <div
-          className="font-bold text-xl cursor-pointer text-primary transform hover:scale-105 active:scale-95 transition-all duration-200"
-          onClick={() => { navigate("/"); setOpenMobile(false); }}
-        >
-          LOGO
-        </div>
+        <img src={LOGO} className="w-25 cursor-pointer" onClick={() => { navigate("/"); setOpenMobile(false); }}/>
 
         <ul className="hidden md:flex gap-8 text-sm font-semibold">
           {menus.map((item) => (
