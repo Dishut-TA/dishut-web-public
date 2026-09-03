@@ -35,7 +35,7 @@ const TransactionHistoryInvestasi = () => {
         console.log(data)
         
         const mappedData: TransactionData[] = data.map((trx: any) => ({
-          id: `#${trx.id || trx.id_transaksi || Math.random().toString(36).substr(2, 6)}`,
+          id: `${trx.id || trx.id_transaksi || Math.random().toString(36).substr(2, 6)}`,
           activityName: trx.nama_program_investasi || trx.program?.nama_program_investasi || trx.program?.nama_program || 'Program Investasi',
           date: new Date(trx.tanggal_bayar || trx.created_at || Date.now()).toLocaleDateString('id-ID'),
           status: trx.status_pembayaran === 'PENDING' ? 'Menunggu Konfirmasi' : (trx.status_pembayaran === 'SUCCESS' || trx.status_pembayaran === 'PAID' ? 'Sudah Dibayar' : trx.status_pembayaran),

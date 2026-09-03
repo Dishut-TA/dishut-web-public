@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { HiOutlineChevronLeft } from 'react-icons/hi2';
+import { getLaporanProyekByIdAPI } from '@/services/invest.service';
+import { useAuth } from '@/context/AuthContext';
+import { ToastError } from '@/utils/toast';
 
 const InfoRow = ({
   label,
@@ -35,10 +38,52 @@ const SectionTitle = ({ title }: { title: string }) => (
 const DetailLaporanProyek: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuth();
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const isSelesai = id === 'PRJ-002';
-  const statusText = isSelesai ? 'Selesai' : 'Sedang Berjalan';
-  const statusColor = isSelesai ? 'text-emerald-600' : 'text-orange-500';
+  useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        setLoading(true);
+        const token = (user as any)?.token || localStorage.getItem('token') || '';
+        const userId = (user as any)?.id || '';
+        if (!userId || !token || !id) return;
+
+        const response = await getLaporanProyekByIdAPI(token, userId, id);
+        console.log("Detail Laporan Proyek:", response);
+        setData(response);
+      } catch (error: any) {
+        console.error(error);
+        ToastError(error.message || 'Gagal memuat detail laporan proyek');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDetail();
+  }, [id, user]);
+
+  const statusText = data?.status_laporan || data?.status || 'Sedang Berjalan';
+  const statusLower = statusText.toLowerCase();
+  
+  let statusColor = 'text-[#185325]';
+  if (statusLower.includes('jalan') || statusLower.includes('proses')) {
+    statusColor = 'text-orange-500';
+  } else if (statusLower.includes('selesai') || statusLower.includes('diterima')) {
+    statusColor = 'text-emerald-600';
+  }
+
+  const formatRupiah = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount || 0);
+  };
+
+  if (loading) {
+    return <div className="p-10 text-center font-bold text-[#185325]">Memuat detail laporan...</div>;
+  }
+
+  if (!data) {
+    return <div className="p-10 text-center font-bold text-red-500">Data laporan tidak ditemukan.</div>;
+  }
 
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto pb-20 animate-[fadeIn_0.3s_ease-out] relative">
@@ -59,28 +104,27 @@ const DetailLaporanProyek: React.FC = () => {
         {/* 1. Informasi Laporan */}
         <h2 className="text-base font-bold text-gray-800 mb-4">Informasi Laporan</h2>
         <div className="flex flex-col gap-3">
-          <InfoRow label="Nama Investasi" value="Ekowisata Kebun Stroberi" />
-          <InfoRow label="Periode Laporan" value="24 Agustus 2025" />
+          <InfoRow label="Nama Investasi" value={data.program?.nama_program || data.nama_program || '-'} />
+          <InfoRow label="Periode Laporan" value={data.tanggal_laporan || data.created_at ? new Date(data.tanggal_laporan || data.created_at).toLocaleDateString('id-ID') : '-'} />
           <InfoRow label="Status" value={statusText} valueColor={statusColor} />
         </div>
 
         {/* 2. Informasi Milestone */}
         <SectionTitle title="Informasi Milestone" />
         <div className="flex flex-col gap-3">
-          <InfoRow label="Nama Milestone" value="Milestone 1" />
-          <InfoRow label="Batas Milestone" value="22/04/2024" />
+          <InfoRow label="Nama Milestone" value={data.milestone?.judul_milestone || data.nama_milestone || '-'} />
+          <InfoRow label="Batas Milestone" value={data.milestone?.target_tanggal ? new Date(data.milestone.target_tanggal).toLocaleDateString('id-ID') : '-'} />
           <InfoRow 
             label="Status" 
             value={
-              <span className="flex items-center gap-1 text-emerald-600">
-                Tercapai <span className="font-bold">✓</span>
+              <span className={`flex items-center gap-1 ${data.milestone?.status === 'Tercapai' ? 'text-emerald-600' : 'text-orange-500'}`}>
+                {data.milestone?.status || '-'} {data.milestone?.status === 'Tercapai' && <span className="font-bold">✓</span>}
               </span>
             } 
           />
-          <InfoRow label="Dokumen Milestone" value="RencanaProyekPembangunanEkowisata.pdf" isLink={true} />
           <InfoRow 
             label="Deskripsi" 
-            value="Lorem ipsum dolor sit amet consectetur. Faucibus faucibus urna nulla amet at nascetur. Enim aliquam sed nibh bibendum. Pulvinar nec risus et vulputate consequat tortor. Quisque tristique in dapibus laoreet eu augue. Maecenas quam eget habitant non. Lobortis lobortis dui phasellus sodales consectetur faucibus mauris eros odio. Diam tortor massa et venenatis ornare tristique nulla." 
+            value={data.milestone?.deskripsi || data.milestone?.deskripsi || '-'} 
             isDeskripsi={true}
           />
         </div>
@@ -88,16 +132,20 @@ const DetailLaporanProyek: React.FC = () => {
         {/* 3. Penggunaan Dana */}
         <SectionTitle title="Penggunaan Dana" />
         <div className="flex flex-col gap-3">
-          <InfoRow label="Dana Terpakai" value="Rp 27.000.000" />
-          <InfoRow label="Sisa Dana" value="Rp 3.000.000" />
+          <InfoRow label="Dana Terpakai" value={formatRupiah(data.dana_terpakai || data.penggunaan_dana || 0)} />
+          <InfoRow label="Sisa Dana" value={formatRupiah(data.sisa_dana || 0)} />
         </div>
 
         {/* 4. Dokumen Perkembangan */}
         <SectionTitle title="Dokumen Perkembangan" />
         <div className="flex flex-col gap-3">
-          <span className="text-sm text-gray-800 font-medium underline cursor-pointer hover:text-gray-600 w-fit">
-            dokumen_pendukung.pdf
-          </span>
+          {data.dokumen_pendukung_url ? (
+            <a href={data.dokumen_pendukung_url} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-800 font-medium underline cursor-pointer hover:text-gray-600 w-fit">
+              Lihat Bukti Lampiran
+            </a>
+          ) : (
+            <span className="text-sm text-gray-500">Tidak ada dokumen.</span>
+          )}
         </div>
 
       </div>

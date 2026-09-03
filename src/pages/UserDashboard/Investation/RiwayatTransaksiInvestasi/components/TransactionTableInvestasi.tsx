@@ -28,7 +28,6 @@ const TransactionTableInvestasi: React.FC<TransactionTableInvestasiProps> = ({ d
         </thead>
         <tbody>
           {data.map((item, index) => {
-            const cleanId = item.id.replace('#', '');
             return (
               <tr key={index} className="border-b border-gray-100/70 transition-colors duration-200 text-sm font-semibold text-primary/90 hover:bg-gray-50/50">
                 <td className="py-5 px-6 font-bold text-primary">{item.activityName}</td>
@@ -37,7 +36,7 @@ const TransactionTableInvestasi: React.FC<TransactionTableInvestasiProps> = ({ d
                 <td className="py-5 px-6 font-bold text-gray-800">{formatRupiah(item.amount)}</td>
                 <td className="py-5 px-6 text-center">
                   <button 
-                    onClick={() => navigate(`/investasi/riwayat-transaksi/${cleanId}`)} 
+                    onClick={() => navigate(`/investasi/riwayat-transaksi/${item.id}`)} 
                     className="text-primary hover:text-tertiary font-bold transition-all duration-200 inline-flex items-center gap-1 cursor-pointer"
                   >
                     Detail <FiChevronRight size={16} />

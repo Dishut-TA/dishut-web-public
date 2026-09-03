@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   HiEye, 
@@ -8,6 +8,9 @@ import {
   HiOutlineArrowRight 
 } from 'react-icons/hi2';
 import TransactionItem from './components/TransactionItem';
+import { getWalletAPI } from '@/services/invest.service';
+import { useAuth } from '@/context/AuthContext';
+import { ToastError } from '@/utils/toast';
 
 const mockTransactions = [
   { id: 1, type: 'Transfer Bank', date: '10/09/2024 - 10.00', amount: -1000000, bank: 'Bank BCA' },
@@ -18,8 +21,49 @@ const mockTransactions = [
 
 const SaldoKeuntungan = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
   const [isVisible, setIsVisible] = useState(true);
-  const totalBalance = 3750000;
+  const [totalBalance, setTotalBalance] = useState<number>(0);
+  const [transactions, setTransactions] = useState<any[]>(mockTransactions);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      try {
+        setIsLoading(true);
+        const token = (user as any)?.token || localStorage.getItem('token') || '';
+        const userId = (user as any)?.id || '';
+        
+        if (!userId || !token) return;
+
+        const data = await getWalletAPI(token, userId);
+        
+        // Map response to match our state structure, accommodating common key names
+        const balance = data.saldo || data.total_saldo || data.balance || 0;
+        setTotalBalance(parseFloat(balance));
+        
+        const historyData = data.riwayat || data.transactions || data.history;
+        if (historyData && Array.isArray(historyData) && historyData.length > 0) {
+          const mappedHistory = historyData.map((tx: any, index: number) => ({
+            id: tx.id || index,
+            type: tx.type || tx.jenis_transaksi || 'Transaksi',
+            date: tx.created_at ? new Date(tx.created_at).toLocaleString('id-ID') : '-',
+            amount: parseFloat(tx.amount || tx.nominal || 0),
+            bank: tx.bank || tx.metode_pembayaran || '-'
+          }));
+          setTransactions(mappedHistory);
+        }
+      } catch (error) {
+        console.error('Error fetching wallet data:', error);
+        ToastError('Gagal memuat data saldo.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchWalletData();
+  }, [user]);
 
   const formatRupiah = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -78,9 +122,15 @@ const SaldoKeuntungan = () => {
         </div>
 
         <div className="space-y-0">
-          {mockTransactions.map((tx) => (
-            <TransactionItem key={tx.id} transaction={tx} />
-          ))}
+          {isLoading ? (
+            <div className="text-center text-gray-500 py-10 font-medium">Memuat transaksi...</div>
+          ) : transactions.length > 0 ? (
+            transactions.map((tx) => (
+              <TransactionItem key={tx.id} transaction={tx} />
+            ))
+          ) : (
+            <div className="text-center text-gray-400 py-10">Belum ada riwayat transaksi.</div>
+          )}
         </div>
       </div>
       

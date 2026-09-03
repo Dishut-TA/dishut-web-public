@@ -129,12 +129,6 @@ const InvestmentDetail: React.FC = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            
-            <div className="grid grid-cols-3 gap-3 md:gap-4 mb-8">
-              <div className="bg-[#D9D9D9] rounded-xl aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
-              <div className="bg-[#D9D9D9] rounded-xl aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
-              <div className="bg-[#D9D9D9] rounded-xl aspect-16/10 w-full cursor-pointer hover:opacity-80 transition-opacity"></div>
-            </div>
 
             <div className="flex items-center justify-between pb-2 mb-6 text-sm font-semibold text-[#828282] gap-4">
               <div className="flex gap-4 md:gap-6 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1 pb-1">
