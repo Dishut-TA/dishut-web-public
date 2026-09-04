@@ -50,12 +50,20 @@ const DonasiDetail: React.FC = () => {
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
 
-        const mappedDonors = sortedDonations.map((d: any, index: number) => ({
-          id: d.id || index,
-          name: d.donor?.donor_name || "Hamba Allah",
-          amount: d.seed_quantity || 0,
-          timeAgo: getTimeAgo(d.created_at) 
-        }));
+          const mappedDonors = sortedDonations.map((d: any, index: number) => {
+          // Hitung total jumlah bibit dari array seed_details
+          const totalBibit = Array.isArray(d.seed_details) 
+            ? d.seed_details.reduce((sum: number, bibit: any) => sum + (Number(bibit.quantity) || 0), 0)
+            : 0;
+
+          return {
+            id: d.id || index,
+            name: d.donor?.donor_name || "Hamba Allah",
+            amount: totalBibit, // <--- Gunakan total yang baru dihitung
+            timeAgo: getTimeAgo(d.created_at) 
+          };
+        });
+
         
         setDonors(mappedDonors);
       } catch (error) {
