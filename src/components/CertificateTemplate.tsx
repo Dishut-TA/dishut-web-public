@@ -8,10 +8,11 @@ interface CertificateProps {
   lokasi: string;
   jumlahBibit: number;
   tanggal: string;
+  jenisBibit?: string;
 }
 
 const CertificateTemplate = forwardRef<HTMLDivElement, CertificateProps>(
-  ({ nama, lokasi, jumlahBibit, tanggal }, ref) => {
+  ({ nama, lokasi, jumlahBibit, tanggal, jenisBibit }, ref) => {
     return (
       <div className="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none overflow-hidden">
         <div
@@ -94,8 +95,8 @@ const CertificateTemplate = forwardRef<HTMLDivElement, CertificateProps>(
             </div>
 
             {/* Badge Jumlah Bibit */}
-            <div className="mt-4 mx-auto bg-primary text-white px-8 py-2.5 rounded-full text-base font-bold shadow-md">
-              Kontribusi Bibit Pohon dengan Kategori Perorangan sebanyak {jumlahBibit} bibit pohon.
+            <div className="mt-4 mx-auto bg-primary text-white px-8 py-2.5 rounded-full text-base font-bold shadow-md text-center max-w-[90%]">
+              Kontribusi bibit {jenisBibit ? jenisBibit : 'pohon'} dengan Kategori Perorangan sebanyak {jumlahBibit} bibit.
             </div>
 
             {/* Tanda Tangan Area */}

@@ -65,8 +65,22 @@ const TransactionDonasiDetail: React.FC = () => {
 
         const namaProgram = item.donations?.[0]?.donation_program?.name || '-';
         const lahanProgram = item.donations?.[0]?.donation_program?.location || '-';
-        const seedNames = item.donations?.map((d: any) => d.seed?.nama).join(', ') || '-';
-        const totalQuantity = item.donations?.reduce((sum: number, d: any) => sum + d.seed_quantity, 0) || 0;
+        let allSeedNames: string[] = [];
+        let totalQuantity = 0;
+
+        item.donations?.forEach((d: any) => {
+          if (Array.isArray(d.seed_details)) {
+            d.seed_details.forEach((bibit: any) => {
+              allSeedNames.push(bibit.name || 'Bibit');
+              totalQuantity += Number(bibit.quantity) || 0;
+            });
+          } else if (d.seed) {
+            allSeedNames.push(d.seed.nama);
+            totalQuantity += Number(d.seed_quantity) || 0;
+          }
+        });
+
+        const seedNames = allSeedNames.length > 0 ? allSeedNames.join(', ') : '-';
         const currentSeedStatus = item.donations?.[0]?.seed_status || 'Menunggu Verifikasi';
         const programImage = item.donations?.[0]?.donation_program?.image_url || null;
 
@@ -140,6 +154,7 @@ const TransactionDonasiDetail: React.FC = () => {
         lokasi={data.lahanProgram}
         jumlahBibit={data.jumlah}
         tanggal={data.tanggal.split(' ')[0]} // Ambil YYYY-MM-DD saja
+        jenisBibit={data.jenisBibit}
       />
 
       <div className="mx-auto max-w-5xl px-4 md:px-8 pt-8">

@@ -5,11 +5,11 @@ import { PiPlant } from 'react-icons/pi';
 import StatCard from './components/StatCard';
 import RecentStatus from './components/RecentStatus';
 import PromoBanner from './components/PromoBanner';
-import { getUserDonationDashboardAPI } from '@/services/dashboard.service';
+import { getTransactionsAPI } from '@/services/transaction.service';
 
 const DashboardDonation: React.FC = () => {
   const { user } = useAuth(); 
-  const [data, setData] = useState({
+  const [data, setData] = useState<{ stats: any, recent_statuses: any[] }>({
     stats: { total_donasi: 0, terealisasi: 0, diproses: 0 },
     recent_statuses: []
   });
@@ -18,8 +18,64 @@ const DashboardDonation: React.FC = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await getUserDonationDashboardAPI();
-        setData(res);
+        const res = await getTransactionsAPI();
+        const transactions = Array.isArray(res.payload) ? res.payload : [];
+        let userTransactions = transactions;
+        if (user && user.id) {
+          userTransactions = transactions.filter((item: any) => item.donor?.user_id === user.id);
+        }
+
+        let totalDonasi = 0;
+        let terealisasi = 0;
+        let diproses = 0;
+        const recentStatuses: any[] = [];
+
+        userTransactions.forEach((trx: any) => {
+          trx.donations?.forEach((d: any) => {
+            if (d.seed_status === 'Batal' || d.seed_status === 'Ditolak') return;
+
+            let qty = 0;
+            let firstSeedName = 'Bibit';
+
+            if (Array.isArray(d.seed_details)) {
+              qty = d.seed_details.reduce((sum: number, bibit: any) => sum + (Number(bibit.quantity) || 0), 0);
+              if (d.seed_details.length > 0) firstSeedName = d.seed_details[0].name || 'Bibit';
+            } else if (d.seed) {
+              qty = Number(d.seed_quantity) || 0;
+              firstSeedName = d.seed?.nama || 'Bibit';
+            }
+
+            totalDonasi += qty;
+            
+            if (d.seed_status === 'Terealisasi') {
+              terealisasi += qty;
+            } else if (['Pending', 'Terkumpul', 'Disalurkan', 'Menunggu Verifikasi'].includes(d.seed_status)) {
+              diproses += qty;
+            }
+
+            recentStatuses.push({
+              id: d.id,
+              title: `${qty} ${firstSeedName}`,
+              program: d.donation_program?.name || 'Program Umum',
+              status: d.seed_status || 'Pending',
+              created_at: d.created_at || trx.transaction_date
+            });
+          });
+        });
+
+        // Sort by date descending and get top 5
+        recentStatuses.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        const top5 = recentStatuses.slice(0, 5);
+
+        setData({
+          stats: {
+            total_donasi: totalDonasi,
+            terealisasi: terealisasi,
+            diproses: diproses
+          },
+          recent_statuses: top5
+        });
+
       } catch (error) {
         console.error("Gagal load dashboard", error);
       } finally {
