@@ -32,11 +32,23 @@ const TransactionHistoryDonasi = () => {
         // 1. Ambil nama program dari donasi urutan pertama (karena 1 transaksi = 1 program)
         const programName = item.donations?.[0]?.donation_program?.name || '-';
 
-        // 2. Gabungkan semua jenis bibit yang dibeli menggunakan koma
-        const seedNames = item.donations?.map((d: any) => d.seed?.nama).join(', ') || '-';
+        // 2 & 3. Ambil jenis bibit dan totalkan jumlah bibit dari seed_details
+        let allSeedNames: string[] = [];
+        let totalQuantity = 0;
 
-        // 3. Totalkan semua jumlah bibit dalam 1 transaksi
-        const totalQuantity = item.donations?.reduce((sum: number, d: any) => sum + d.seed_quantity, 0) || 0;
+        item.donations?.forEach((d: any) => {
+          if (Array.isArray(d.seed_details)) {
+            d.seed_details.forEach((bibit: any) => {
+              allSeedNames.push(bibit.name || 'Bibit');
+              totalQuantity += Number(bibit.quantity) || 0;
+            });
+          } else if (d.seed) {
+            allSeedNames.push(d.seed.nama);
+            totalQuantity += Number(d.seed_quantity) || 0;
+          }
+        });
+
+        const seedNames = allSeedNames.length > 0 ? allSeedNames.join(', ') : '-';
 
         return {
           id: item.id.toString(),
