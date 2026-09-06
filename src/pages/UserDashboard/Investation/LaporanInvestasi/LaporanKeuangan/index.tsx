@@ -1,47 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineFunnel, HiOutlineEye } from 'react-icons/hi2';
+import { getLaporanKeuanganAPI } from '@/services/invest.service';
+import { useAuth } from '@/context/AuthContext';
+import { ToastError } from '@/utils/toast';
 
 interface LaporanKeuanganData {
   id: string;
-  no: number;
-  periode: string;
+  periode_awal: string;
+  periode_akhir: string;
   namaInvestasi: string;
-  totalPendapatan: string;
-  totalPengeluaran: string;
-  labaBersih: string;
+  totalPendapatan: number;
+  totalPengeluaran: number;
+  labaBersih: number;
   status: string;
 }
 
-const mockData: LaporanKeuanganData[] = [
-  {
-    id: 'LK-001',
-    no: 1,
-    periode: 'Jan - Juni 2025',
-    namaInvestasi: 'Ekowisata Kebun Stroberi',
-    totalPendapatan: 'Rp 120.000.000',
-    totalPengeluaran: 'Rp 80.000.000',
-    labaBersih: 'Rp 40.000.000',
-    status: 'Menunggu Pembagian',
-  },
-  {
-    id: 'LK-002',
-    no: 2,
-    periode: 'Jan - Juni 2025',
-    namaInvestasi: 'Ekowisata Kebun Stroberi',
-    totalPendapatan: 'Rp 120.000.000',
-    totalPengeluaran: 'Rp 80.000.000',
-    labaBersih: 'Rp 40.000.000',
-    status: 'Sudah Dibagikan',
-  }
-];
-
 const LaporanKeuangan: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [data, setData] = useState<LaporanKeuanganData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLaporan = async () => {
+      try {
+        setLoading(true);
+        const token = (user as any)?.token || localStorage.getItem('token') || '';
+        const userId = (user as any)?.id || '';
+        if (!userId || !token) return;
+
+        const responseData = await getLaporanKeuanganAPI(token, userId);
+        
+        // Log untuk mengantisipasi data atribut yang salah
+        console.log("Data Laporan Keuangan (investor):", responseData);
+        
+        const mappedData = responseData.map((item: any) => ({
+          id: item.id || item.id_laporan || '',
+          periode_awal: item.periode_awal,
+          periode_akhir: item.periode_akhir,
+          namaInvestasi: item.program?.nama_program || item.nama_program || item.judul_laporan || 'Laporan Keuangan',
+          totalPendapatan: parseFloat(item.total_pendapatan || item.pendapatan || 0),
+          totalPengeluaran: parseFloat(item.total_pengeluaran || item.pengeluaran || 0),
+          labaBersih: parseFloat(item.laba_bersih || item.keuntungan || 0),
+          status: item.status_laporan || item.status || 'Sedang Berjalan',
+        }));
+
+        setData(mappedData);
+      } catch (error: any) {
+        console.error(error);
+        ToastError(error.message || 'Gagal memuat laporan keuangan');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLaporan();
+  }, [user]);
+
+  const formatRupiah = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', { 
+      style: 'currency', 
+      currency: 'IDR', 
+      minimumFractionDigits: 0 
+    }).format(amount);
+  };
 
   const getStatusColor = (status: string) => {
-    if (status === 'Menunggu Pembagian') return 'text-orange-500';
-    if (status === 'Sudah Dibagikan') return 'text-[#185325]';
+    const s = status?.toLowerCase() || '';
+    if (s.includes('tunggu') || s.includes('proses') || s.includes('pending')) return 'text-orange-500';
+    if (s.includes('sudah') || s.includes('bagi') || s.includes('selesai')) return 'text-[#185325]';
     return 'text-gray-800';
   };
 
@@ -75,43 +102,53 @@ const LaporanKeuangan: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {mockData.map((data, idx) => (
-              <tr 
-                key={data.id} 
-                className="border-b border-[#185325]/20 transition-colors duration-200 text-sm font-bold hover:bg-gray-50/50"
-              >
-                <td className="py-5 px-4 text-[#185325] text-center">
-                  {idx + 1}
-                </td>
-                <td className="py-5 px-4 text-[#185325]">
-                  {data.periode}
-                </td>
-                <td className="py-5 px-4 text-[#185325]">
-                  {data.namaInvestasi}
-                </td>
-                <td className="py-5 px-4 text-[#185325]">
-                  {data.totalPendapatan}
-                </td>
-                <td className="py-5 px-4 text-[#185325]">
-                  {data.totalPengeluaran}
-                </td>
-                <td className="py-5 px-4 text-[#185325]">
-                  {data.labaBersih}
-                </td>
-                <td className={`py-5 px-4 ${getStatusColor(data.status)}`}>
-                  {data.status}
-                </td>
-                <td className="py-5 px-4 flex justify-center items-center">
-                  <button 
-                    title="Lihat Detail"
-                    onClick={() => navigate(`/laporan-investasi/keuangan/${data.id}`)}
-                    className="p-1.5 text-[#185325] hover:bg-[#185325]/10 rounded-full transition-colors"
-                  >
-                    <HiOutlineEye className="w-5 h-5" />
-                  </button>
-                </td>
+            {loading ? (
+              <tr>
+                <td colSpan={8} className="py-10 text-center text-[#185325] font-semibold">Memuat laporan...</td>
               </tr>
-            ))}
+            ) : data.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="py-10 text-center text-[#185325] font-semibold">Belum ada laporan keuangan.</td>
+              </tr>
+            ) : (
+              data.map((item, idx) => (
+                <tr 
+                  key={item.id} 
+                  className="border-b border-[#185325]/20 transition-colors duration-200 text-sm font-bold hover:bg-gray-50/50"
+                >
+                  <td className="py-5 px-4 text-[#185325] text-center">
+                    {idx + 1}
+                  </td>
+                  <td className="py-5 px-4 text-[#185325]">
+                    {item.periode_awal} - {item.periode_akhir}
+                  </td>
+                  <td className="py-5 px-4 text-[#185325]">
+                    {item.namaInvestasi}
+                  </td>
+                  <td className="py-5 px-4 text-[#185325]">
+                    {formatRupiah(item.totalPendapatan)}
+                  </td>
+                  <td className="py-5 px-4 text-[#185325]">
+                    {formatRupiah(item.totalPengeluaran)}
+                  </td>
+                  <td className="py-5 px-4 text-[#185325]">
+                    {formatRupiah(item.labaBersih)}
+                  </td>
+                  <td className={`py-5 px-4 ${getStatusColor(item.status)}`}>
+                    {item.status}
+                  </td>
+                  <td className="py-5 px-4 flex justify-center items-center">
+                    <button 
+                      title="Lihat Detail"
+                      onClick={() => navigate(`/laporan-investasi/keuangan/${item.id}`)}
+                      className="p-1.5 text-[#185325] hover:bg-[#185325]/10 rounded-full transition-colors"
+                    >
+                      <HiOutlineEye className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

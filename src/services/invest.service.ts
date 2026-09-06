@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_INVEST_URL;
+// const API_URL = import.meta.env.VITE_API_INVEST_URL;
+const API_URL = import.meta.env.VITE_API_EXAMPLE;
 
 export const getPublicProgramsAPI = async () => {
   try {
@@ -117,4 +118,106 @@ export const simulatePaymentWebhookAPI = async (transactionId: string) => {
   }
 };
 
+export const getWalletAPI = async (token: string, userId: string | number) => {
+  try {
+    const response = await fetch(`${API_URL}/investor/wallet`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-User-Id': String(userId)
+      },
+    });
 
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Gagal mengambil data wallet.');
+    }
+
+    return result.payload;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLaporanProyekAPI = async (token: string, userId: string | number) => {
+  try {
+    const response = await fetch(`${API_URL}/investor/laporan-proyek`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-User-Id': String(userId)
+      },
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Gagal mengambil laporan proyek.');
+    return result.payload.data || result.payload || [];
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLaporanProyekByIdAPI = async (token: string, userId: string | number, id: string) => {
+  try {
+    const response = await fetch(`${API_URL}/investor/laporan-proyek/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-User-Id': String(userId)
+      },
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Gagal mengambil detail laporan proyek.');
+    return result.payload;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLaporanKeuanganAPI = async (token: string, userId: string | number) => {
+  try {
+    const response = await fetch(`${API_URL}/investor/laporan-keuangan`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-User-Id': String(userId)
+      },
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Gagal mengambil laporan keuangan.');
+    return result.payload.data || result.payload || [];
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLaporanKeuanganByIdAPI = async (token: string, userId: string | number, id: string) => {
+  try {
+    const response = await fetch(`${API_URL}/investor/laporan-keuangan/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-User-Id': String(userId)
+      },
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Gagal mengambil detail laporan keuangan.');
+    return result.payload;
+  } catch (error) {
+    throw error;
+  }
+};

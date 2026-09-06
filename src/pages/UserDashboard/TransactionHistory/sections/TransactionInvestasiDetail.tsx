@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiDownload } from 'react-icons/fi';
 import { ToastSuccess, ToastError } from '@/utils/toast';
-import { mockInvestasi } from '../../Investation/RiwayatTransaksiInvestasi/TransactionHistoryInvestasi';
+import { getRiwayatTransaksiAPI } from '@/services/invest.service';
+import { useAuth } from '@/context/AuthContext';
 import type { TransactionData } from '@/utils/interface';
 
 const TransactionInvestasiDetail: React.FC = () => {
@@ -10,15 +11,46 @@ const TransactionInvestasiDetail: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<TransactionData | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (id) {
-      const matchData = mockInvestasi.find(item => item.id.replace('#', '') === id);
-      if (matchData) {
-        setData(matchData);
+    const fetchDetail = async () => {
+      if (id) {
+        try {
+          const token = (user as any)?.token || localStorage.getItem('token') || '';
+          const userId = (user as any)?.id || '';
+          if (!userId) return;
+
+          const responseData = await getRiwayatTransaksiAPI(token, userId);
+          
+          const mappedData: TransactionData[] = responseData.map((trx: any) => ({
+            id: trx.id || trx.id_transaksi || Math.random().toString(36).substr(2, 6),
+            activityName: trx.nama_program_investasi || trx.program?.nama_program_investasi || trx.program?.nama_program || 'Program Investasi',
+            date: trx.tanggal_bayar ? new Date(trx.tanggal_bayar.replace(' ', 'T')).toLocaleDateString('id-ID') : (trx.created_at ? new Date(trx.created_at.replace(' ', 'T')).toLocaleDateString('id-ID') : new Date().toLocaleDateString('id-ID')),
+            status: trx.status_pembayaran === 'PENDING' ? 'Menunggu Konfirmasi' : (trx.status_pembayaran === 'SUCCESS' || trx.status_pembayaran === 'PAID' ? 'Sudah Dibayar' : trx.status_pembayaran),
+            amount: parseFloat(trx.total_nominal_pembayaran || trx.nominal_pendanaan || 0),
+            userName: trx.nama_investor || trx.nama || '',
+            userPhone: trx.no_telp || '',
+            userEmail: trx.email || '',
+            paymentMethod: trx.metode_pembayaran || '-'
+          }));
+
+          // Clean up the URL id and mapped id for safe comparison
+          const cleanUrlId = id.replace('#', '');
+          const matchData = mappedData.find(item => item.id.replace('#', '') === cleanUrlId);
+          
+          if (matchData) {
+            setData(matchData);
+          }
+        } catch (error) {
+          console.error(error);
+          ToastError('Gagal memuat detail transaksi');
+        }
       }
-    }
-  }, [id]);
+    };
+
+    fetchDetail();
+  }, [id, user]);
 
   if (!data) {
     return (
@@ -73,13 +105,13 @@ const TransactionInvestasiDetail: React.FC = () => {
 
         <div className="bg-white rounded-xl p-6 md:p-10 shadow-sm border border-gray-100/50">
           <h1 className="text-2xl md:text-[32px] font-bold text-primary tracking-tight mb-6">
-            Order #{id}
+            Order {data.id}
           </h1>
 
           <div className="grid grid-cols-[120px_10px_1fr] md:grid-cols-[150px_10px_1fr] gap-y-3 text-sm md:text-[15px] text-primary font-medium mb-10">
             <div>Tanggal</div>
             <div>:</div>
-            <div>{data.date}, pukul 09.40</div> 
+            <div>{data.date}</div> 
 
             <div>Untuk</div>
             <div>:</div>

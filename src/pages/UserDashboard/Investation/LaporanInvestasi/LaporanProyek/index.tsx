@@ -1,38 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineFunnel, HiOutlineEye } from 'react-icons/hi2';
+import { getLaporanProyekAPI } from '@/services/invest.service';
+import { useAuth } from '@/context/AuthContext';
+import { ToastError } from '@/utils/toast';
 
 interface LaporanProyekData {
   id: string;
-  no: number;
   tanggal: string;
   namaInvestasi: string;
   status: string;
 }
 
-const mockData: LaporanProyekData[] = [
-  {
-    id: 'PRJ-001',
-    no: 1,
-    tanggal: '24/08/2025',
-    namaInvestasi: 'Investasi Ekowisata Kebun Stroberi',
-    status: 'Sedang Berjalan',
-  },
-  {
-    id: 'PRJ-002',
-    no: 1, // Di gambar Figma nomornya 1 lagi, tapi idealnya urut
-    tanggal: '24/08/2025',
-    namaInvestasi: 'Investasi Ekowisata Kebun Stroberi',
-    status: 'Selesai',
-  }
-];
-
 const LaporanProyek: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [data, setData] = useState<LaporanProyekData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLaporan = async () => {
+      try {
+        setLoading(true);
+        const token = (user as any)?.token || localStorage.getItem('token') || '';
+        const userId = (user as any)?.id || '';
+        if (!userId || !token) return;
+
+        const responseData = await getLaporanProyekAPI(token, userId);
+        
+        // Log untuk mengantisipasi data atribut yang salah
+        console.log("Data Laporan Proyek (investor):", responseData);
+        
+        const mappedData = responseData.map((item: any) => ({
+          id: item.id || item.id_laporan || '',
+          tanggal: item.tanggal_laporan || item.created_at ? new Date(item.tanggal_laporan || item.created_at).toLocaleDateString('id-ID') : '-',
+          namaInvestasi: item.program?.nama_program || item.nama_program || item.judul_laporan || 'Laporan Investasi',
+          status: item.status_laporan || item.status || 'Sedang Berjalan',
+        }));
+
+        setData(mappedData);
+      } catch (error: any) {
+        console.error(error);
+        ToastError(error.message || 'Gagal memuat laporan proyek');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLaporan();
+  }, [user]);
 
   const getStatusColor = (status: string) => {
-    if (status === 'Sedang Berjalan') return 'text-orange-500';
-    if (status === 'Selesai') return 'text-emerald-600';
+    const s = status?.toLowerCase() || '';
+    if (s.includes('jalan') || s.includes('proses') || s.includes('pending')) return 'text-orange-500';
+    if (s.includes('selesai') || s.includes('diterima') || s.includes('verify')) return 'text-emerald-600';
     return 'text-[#185325]';
   };
 
@@ -63,34 +83,44 @@ const LaporanProyek: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {mockData.map((data, idx) => (
-              <tr 
-                key={data.id} 
-                className="border-b border-[#185325]/30 transition-colors duration-200 text-sm font-bold hover:bg-gray-50/50"
-              >
-                <td className="py-6 px-2 md:px-4 text-[#185325] text-center">
-                  {idx + 1}
-                </td>
-                <td className="py-6 px-2 md:px-4 text-[#185325]">
-                  {data.tanggal}
-                </td>
-                <td className="py-6 px-2 md:px-4 text-[#185325]">
-                  {data.namaInvestasi}
-                </td>
-                <td className={`py-6 px-2 md:px-4 ${getStatusColor(data.status)}`}>
-                  {data.status}
-                </td>
-                <td className="py-6 px-2 md:px-4 flex justify-center items-center">
-                  <button 
-                    title="Lihat Detail"
-                    onClick={() => navigate(`/laporan-investasi/proyek/${data.id}`)}
-                    className="p-1.5 text-[#185325] hover:bg-[#185325]/10 rounded-full transition-colors"
-                  >
-                    <HiOutlineEye className="w-5 h-5" />
-                  </button>
-                </td>
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="py-10 text-center text-[#185325] font-semibold">Memuat laporan...</td>
               </tr>
-            ))}
+            ) : data.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-10 text-center text-[#185325] font-semibold">Belum ada laporan proyek.</td>
+              </tr>
+            ) : (
+              data.map((item, idx) => (
+                <tr 
+                  key={item.id} 
+                  className="border-b border-[#185325]/30 transition-colors duration-200 text-sm font-bold hover:bg-gray-50/50"
+                >
+                  <td className="py-6 px-2 md:px-4 text-[#185325] text-center">
+                    {idx + 1}
+                  </td>
+                  <td className="py-6 px-2 md:px-4 text-[#185325]">
+                    {item.tanggal}
+                  </td>
+                  <td className="py-6 px-2 md:px-4 text-[#185325]">
+                    {item.namaInvestasi}
+                  </td>
+                  <td className={`py-6 px-2 md:px-4 ${getStatusColor(item.status)}`}>
+                    {item.status}
+                  </td>
+                  <td className="py-6 px-2 md:px-4 flex justify-center items-center">
+                    <button 
+                      title="Lihat Detail"
+                      onClick={() => navigate(`/laporan-investasi/proyek/${item.id}`)}
+                      className="p-1.5 text-[#185325] hover:bg-[#185325]/10 rounded-full transition-colors"
+                    >
+                      <HiOutlineEye className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

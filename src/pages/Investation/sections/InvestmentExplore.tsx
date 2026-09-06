@@ -17,7 +17,7 @@ const InvestmentExplore: React.FC = () => {
           .filter((item: any) => item.status === 'ACTIVE') 
           .map((item: any) => ({
             id: item.id,
-            image: "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=800&q=80",
+            image: item.gambar,
             title: item.nama_program,
             description: item.deskripsi,
             collected: Number(item.dana_terkumpul) || 0,
