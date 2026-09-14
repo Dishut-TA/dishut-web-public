@@ -147,7 +147,7 @@ const VerifikasiInvestasi: React.FC = () => {
                           onClick={() => navigate(`/investasi/history/${data.id}`)}
                           className="text-[#9C6644] hover:text-[#7f4f34] text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
                         >
-                          Detail <FiChevronRight size={14} />
+                          
                         </button>
                       )}
                     </td>
