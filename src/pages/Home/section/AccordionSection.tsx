@@ -4,7 +4,7 @@ const DATA = [
   {
     title: "Apa Itu Lahan Kritis",
     content:
-      "Lorem ipsum dolor sit amet",
+      "Lahan kritis adalah wilayah atau lahan di dalam maupun di luar kawasan hutan yang mengalami penurunan fungsi ekologis—seperti media pengatur tata air Daerah Aliran Sungai (DAS) dan unsur produktivitas tanah—sehingga tidak lagi optimal atau rusak secara fisik, kimia, maupun biologi.",
   },
   {
     title: "Dampak Kerusakan Hutan",
@@ -14,7 +14,7 @@ const DATA = [
   {
     title: "Pentingnya Rehabilitasi",
     content:
-      "Lorem ipsum dolor sit amet",
+      "Rehabilitasi menjadi kunci utama untuk memulihkan fungsi ekologis lingkungan, menjamin ketersediaan air, dan mengembalikan produktivitas tanah demi kesejahteraan manusia. Jika lahan kritis dibiarkan tanpa penanganan, kerusakan lingkungan akan meluas dan memicu berbagai bencana alam serta krisis ekonomi.",
   },
 ];
 
